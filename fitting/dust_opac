@@ -1,0 +1,54 @@
+#ndust, idtab (Number of species, table format: 1-Budaj, 2-Semenov)
+2       1
+#dtlow [K] dthig [K] drmf  for each species, one per line
+5.     150.    0.90
+5.     2000.   0.10
+#file names with dust opacities of each species, one per line
+water_n2
+forsterite_opac_dm00
+-------------------------------------------------------------------
+water_opac_all
+forsterite_opac_dm00
+5.     2000.   0.05
+enstatite_opac_00
+Lines below are not read. They just store premade options.
+
+#ndust, idtab (Number of species, table format: 1-Budaj, 2-Semenov)
+1       1
+#dtlow [K] dthig [K] drmf  for each species, one per line
+5.      1500.         1.
+#file names with dust opacities of each species, one per line
+dull
+
+
+#ndust, idtab (Number of species, table format: 1-Budaj, 2-Semenov)
+4       1
+#dtlow [K] dthig [K] drmf  for each species, one per line
+10.        1500.       0.25
+10.        1500.       0.25
+10.        1500.       0.25
+10.        1500.       0.25
+#file names with dust opacities of each species, one per line
+mie_opac
+mie_opac
+mie_opac
+mie_opac
+
+#ndust, idtab (Number of species, table format: 1-Budaj, 2-Semenov)
+5       2
+#dtlow [K] dthig [K] drmf  for each species, one per line
+5.      100.    100.
+100.    275.    100.
+275.    425.    100.
+425.    680.    100.
+680.   1500.    100.
+#file names with dust opacities of each species, one per line
+semenov1.dat
+semenov2.dat
+semenov3.dat
+semenov4.dat
+semenov5.dat
+#Semenov opacities are for Gas+dust that is why drmf=100.
+
+#dtlow<=dthig  dust temperature range of each species (or input files)
+#drmf, dust relative mas fraction of each species within the dust <0,1>
