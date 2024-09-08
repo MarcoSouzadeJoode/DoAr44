@@ -1,0 +1,16 @@
+
+            write(*,*) 'i = ', i
+            write(*,*) 'j = ', j
+            write(*,*) 'k = ', k
+            write(*,*) 'l = ', l
+            write(*,*) 'Z_(i) = ', Z_(i)
+            write(*,*) 'logg_(i,j) = ', logg_(i,j)
+            write(*,*) 'Teff_(i,j,k) = ', Teff_(i,j,k)
+            write(*,*) 'Z_limb(l) = ', Z_limb(l)
+            write(*,*) 'logg_limb(l) = ', logg_limb(l)
+            write(*,*) 'Teff_limb(l) = ', Teff_limb(l)
+
+              if (u8(m,i,j,k).gt.1.d0) then
+                write(*,*) 'u8 = ', u8(m,i,j,k)
+                stop
+              endif

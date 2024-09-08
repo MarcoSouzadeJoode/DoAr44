@@ -1,0 +1,1644 @@
+2c2,8
+< 	Program SHELLSPEC
+---
+> 	program shellrun
+> 	call shellspec()
+> 	stop
+> 	end program shellrun
+> !
+> 	subroutine shellspec()
+> !	program shellspec
+11c17
+< !       optically thin.
+---
+> !       optically thin. Shadows can be taken into account as well.
+16,17c22,23
+< !	a central star, companion star, envelope, spot, stream, ring,
+< !       disk, nebula, flow, jet, ufo, shell or an empty space 
+---
+> !	a central STAR, COMPANION star, SPOT, STREAM, RING,
+> !       DISK, ENVELOPE, NEBULA, FLOW, JET, UFO, SHELL or an empty space 
+43c49,51
+< !		phases - (15) orbital phases to calculate
+---
+> !		lambda - (15) list of lambda [A] to calculate
+> !			(optional if loglam=2)
+> !		phases - (15) list of orbital phases to calculate
+65a74
+> !		errors - (3) error messages
+72c81
+< !		 implicit double precision is used and 
+---
+> !		 real(kind=8) i.e. double precision is used and 
+81c90
+< !	Author/contact: Jan Budaj, Mercedes Richards
+---
+> !	Author/contact: Jan Budaj
+90,92c99
+< !	-introduce a new subroutine with the checks not goto 590
+< !       -calculate H opacity at each lambda in case of long SED??
+< !        (this is slow so uncomment lines if necessary)
+---
+> !	move envelope input behind the disk in the shellspec.in??
+97d103
+< !	-allow finner grid along the line of sight, step op.dep.<0.05
+105a112,113
+> !	-broadening of H lines
+> !       -save memory by declaring velocities & temperatures real*4
+113c121
+< !		mfreq - max. number of frequnces
+---
+> !		mfreq - max. number of frequences
+125c133
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+130a139
+> !	line of sight quantities are in 1D fields
+135a145,146
+> 	integer(i1):: lshade(ndim3)
+> !	most memory consuming 3D fields and the body frozen grid
+142c153,155
+<         real(i8):: aint(ndim1,ndim2,mfreq)     
+---
+> 	integer(i1):: kshade(ndimf1,ndimf2,ndimf3)
+>         real(i8):: aint(ndim1,ndim2,mfreq)
+> !	line of sight with 1D fields up to untransparent point
+145a159
+> 	integer(i1):: mshade(ndim3)
+195c209
+<         real(i8):: phase1,phasen,dinc,dd
+---
+>         real(i8):: phase1,phasen,dinc,dd,vgamma
+225,226c239,240
+< 	real(i8):: xneb,yneb,zneb,vxnb,vynb,vznb
+< 	real(i8):: tempnb,densnb,anenb,vtrbnb,edennb,etmpnb,hmulnb
+---
+> 	real(i8):: xneb,yneb,zneb,vxnb,vynb,vznb,hcnb,hshdnb
+> 	real(i8):: tempnb,densnb,anenb,vtrbnb,edennb,etmpnb
+231c245,247
+< 	real(i8):: ajet,rinjt,routjt,vjt,xjet,yjet,zjet,vxjt,vyjt,vzjt
+---
+> 	real(i8):: ajet,rinjt,routjt
+> 	real(i8):: xjt,yjt,zjt,xjet,yjet,zjet
+> 	real(i8):: vjt,eveljt,rcjt,vxjt,vyjt,vzjt
+241c257
+< 	real(i8):: freq,plocha,der,cont,fluxl,fluxs,refw,dvel
+---
+> 	real(i8):: freq,plocha,der,cont,fluxl,fluxs,refw,dvel,alamg
+250c266
+< 	integer:: idennb,itnb,ituf
+---
+> 	integer:: iinvnb,idennb,ishdnb,itnb,ituf,ivjt
+268a285
+>         write(6,'(A)')' lambda - list of lambda  (optional if loglam=2)'
+284a302
+>         write(6,'(A)')' errors - error messages'
+286a305
+> 	open(3,file='errors',status='unknown')
+322c341
+< !       alam1, alamn, alams -start,end and step of wavelength in [A]    
+---
+> !       alam1, alamn, alams -start, end and step of wavelength in [A]    
+331a351,354
+> !       loglam=2 lambda's are read from file lambda. It sets nfreq. 
+> !         Good for comparison with the observations.
+> !         H continum opacity is calculated at each lambda.
+> !         (Dust opacity is interpolated to lambda independ. of loglam)	
+353c376,377
+< !                 or background (temp0,ane0,...)
+---
+> !                 or background (temp0,ane0,...) 
+> !                 does not support shadows (sets lshade=3)
+355c379
+< !                 but can handle discontinuities
+---
+> !                 but can handle discontinuities and shadows
+371c395
+< !               (assumes optically thin environment)
+---
+> !               (assumes optically thin environment)-check also shadows
+376c400
+< !               (assuming optically thin environment)
+---
+> !               (assuming optically thin environment)-check shadows
+392a417
+> !               Check for shadows.
+429a455,456
+> !       vgamma -gamma velocity which is aplied to the spectra in the end
+> !               (independently on the phase/view point)
+492c519
+< !       istar,icomp,ienv,ispot,ism,iring,idisc,
+---
+> !       istar,icomp,ispot,ism,iring,idisc,ienv,
+494,495c521,524
+< !       Order determines the priority in case they happen to overlap.
+< !                 see below
+---
+> !       These are main on/off switches for the objects.
+> !       They are ordered according to priority.
+> !       Priority is determined in smod1.
+> !       It is important in case objects happen to overlap.
+595c624
+< !           (i.e. temperature accounted for e.g. the reflection effect)
+---
+> !           (i.e. temperature accounting for the reflection effect...)
+605a635,639
+> !       ishd* - define shadows for scattering (in some objects)
+> !             =0 no scattering
+> !             =1 scattering from central star only
+> !             =2 scattering from secondary star only
+> !             =3 scattering from both stars
+654,676d687
+< !-------envelope around the primary star
+< !       ienv,emen,ggen,ffen have similar meaning to istar,emstar,qq,ffst
+< !       ienv=2 envelope is on, has a detached Roche shape
+< !       ienv=3 envelope is on, has a contact Roche shape
+< !           (common envelope)
+< !       emen -mass of the central star [M_sol]
+< !       qqen -mass ratio (companion/star)
+< !       ffen<=1 -Roche lobe fill-in factor of the detached envelope. 
+< !         It is radius of the substellar point of the envelope
+< !         relative to the radius of the L1. Roche lobe has ffen=1.
+< !       1<ffen<=2 -Roche lobe fill-out factor of the contact envelope
+< !               ffen=(C1-C)/(C1-C2)+1
+< !       hen -vertical limit [R_sol], limits the envelope in 
+< !         the direction perpendicular to the orbital plane to z<+-hen
+< !       tempen -constant temperature [K]
+< !       densen -constant gas density [g/cm^3]
+< !       aneen -constant electron number density [cm^-3]
+< !       dstden -constant dust density [g/cm^3]
+< !               you must also set densen>0. to have an effect
+< !       dstten -constant dust temperature [K]
+< !               it must be higher than the condensation temperature
+< !               of some species (see dust_opac) to have an effect
+< !       vtrben -microturbulence [km/s]
+819a831,853
+> !-------envelope around the primary star
+> !       ienv,emen,ggen,ffen have similar meaning to istar,emstar,qq,ffst
+> !       ienv=2 envelope is on, has a detached Roche shape
+> !       ienv=3 envelope is on, has a contact Roche shape
+> !           (common envelope)
+> !       emen -mass of the central star [M_sol]
+> !       qqen -mass ratio (companion/star)
+> !       ffen<=1 -Roche lobe fill-in factor of the detached envelope. 
+> !         It is radius of the substellar point of the envelope
+> !         relative to the radius of the L1. Roche lobe has ffen=1.
+> !       1<ffen<=2 -Roche lobe fill-out factor of the contact envelope
+> !               ffen=(C1-C)/(C1-C2)+1
+> !       hen -vertical limit [R_sol], limits the envelope in 
+> !         the direction perpendicular to the orbital plane to z<+-hen
+> !       tempen -constant temperature [K]
+> !       densen -constant gas density [g/cm^3]
+> !       aneen -constant electron number density [cm^-3]
+> !       dstden -constant dust density [g/cm^3]
+> !               you must also set densen>0. to have an effect
+> !       dstten -constant dust temperature [K]
+> !               it must be higher than the condensation temperature
+> !               of some species (see dust_opac) to have an effect
+> !       vtrben -microturbulence [km/s]
+822,825c856,860
+< !       inebl not=4  -nebula off
+< !       inebl=4 flared protoplanetary disk
+< !               vertical scale height is H(r)=(gamma*k*T_gas/m)**0.5
+< !             vertical structure:
+---
+> !       inebl not=1  -nebula is off
+> !       inebl=1 flared protoplanetary or accretion disk
+> !               vertical scale height is: 
+> !               H(r)=hcnb*(gamma*k*T_gas/m)**0.5
+> !             Vertical structure:
+828,829c863,865
+< !               gas temperature may have temperature inversion
+< !             radial structure:
+---
+> !               Density may have wind region.		
+> !               Gas temperature may have vertical temperature inversion.
+> !             Radial structure:
+831,832c867,868
+< !               dust dens & electron num. dens are ~ density
+< !               gas and dust temperatures change with radius
+---
+> !               dust dens & electron num. dens are ~ density.
+> !               Gas and dust temperatures change with radius.
+839,840c875,878
+< !       hinvnb,tinvnb -describe vertical gas temperature inversion
+< !       hinvnb  start of vertical gas temp. inversion in [H]
+---
+> !       iinvnb,hinvnb,tinvnb -describe vertical gas temp. inversion
+> !               (only if itnb=3).
+> !               There is no inversion in dust temperature.
+> !       hinvnb  -start of vertical gas temp. inversion in [H]
+843c881,883
+< !       tinvnb  temperature multiplication factor in the inversion
+---
+> !       tinvnb  -temperature multiplication factor in the inversion
+> !       iinvnb=0 no inversion
+> !       iinvnb=1 step fuction inversion
+844a885,886
+> !       iinvnb=2 linear inversion from temp0 at hinvnb*H(r) to
+> !               tinvnb*temp0(r) at aneb*H(r)
+846,847c888
+< !               Note: this was changed to linear from hinvnb up to aneb
+< !       hwindnb -vertical scale-height of the wind region
+---
+> !       hwindnb -start of the wind region in vertical scale-heights
+857a899,903
+> !       hcnb    allows to multiply the classical vertical scale-height
+> !               by some factor
+> !       ishdnb  =0,1,2,3 (describes shadows for scattering)
+> !       hshdnb  -start of the scattering region in [H]
+> !               if z>hshdnb*H then kshade=ishdnb else kshade=0
+865c911
+< !               gas temp=tempnb, dust temp=dsttnb
+---
+> !               gas temp=tempnb, dust temp=dsttnb (no inversion)
+868c914,915
+< !               T(r)=dsttuf*(Rnb/r)**0.75*(1-(Rnb/r)**0.5)**0.25       
+---
+> !               T(r)=dsttuf*(Rnb/r)**0.75*(1-(Rnb/r)**0.5)**0.25
+> !               no inversion       
+870,871c917,918
+< !               T(r)=tempnb*(r/rinnb)**etmpnb
+< !               T(r)=dsttnb*(r/rinnb)**etmpnb
+---
+> !               gas:  T(r)=tempnb*(r/rinnb)**etmpnb
+> !               dust: T(r)=dsttnb*(r/rinnb)**etmpnb
+885d931
+< !       hmulnb -scale height multiplication factor (i.e. non-hydrostatic)
+923c969
+< !       ijet=2  jet has two cones: primary cone and opposite one
+---
+> !       ijet=2  jet has two cones: the primary cone and the opposite one
+927c973
+< !       vjt  -radial (expanding) velocity of the jet [km/s]
+---
+> !	xjt,yjt,zjt -location of the jet origin [R_sol]
+929a976,982
+> !       ivjt -the velocity field switch
+> !       ivjt not equal 2 -radial velocity is polynomial 
+> !                v(r)=vjt*(r/rinjt)**eveljt
+> !       ivjt=2  radial velocity is: v(r)=vjt*(1-rcjt/r)**eveljt
+> !       vjt  -radial velocity at the inner edge of the jet [km/s]
+> !       eveljt -velocity exponent
+> !       rcjt -radius of the object in the jet, only if ivjt=2, [R_sol] 
+934c987
+< !         density=densjt*rinjt**2/routjt**2
+---
+> !         density=densjt*rinjt**2/routjt**2*v(rinjt)/v(r)
+940c993
+< !               you must also set densjt>0. to have an effect
+---
+> !               you must also set densjt>0.0 to have an effect
+1021,1022c1074,1075
+< !               star,companion,spot,stream,ring,disc,nebula,flow,
+< !               jet,ufo,shell,and background.
+---
+> !               star,companion,spot,stream,ring,disc,envelope,nebula,
+> !               flow,jet,ufo,shell,and background.
+1030,1034c1083
+< !       These objects are allowed to make eclipses along the line of     
+< !       sight but cast no shadows into other directions (i.e. are       
+< !       transparent when considering scattered light from               
+< !       the central star).                                               
+< !       Note that lunt1, lunt2, lunt3 are in fact associated with 
+---
+> !         Note that lunt1, lunt2, lunt3 are in fact associated with 
+1045c1094,1106
+< !       Input variables which are supposed to be components of a unit 
+---
+> !         Treatment of the scattered light assumes that the medium is 
+> !       optically thin, more precisely, that there is no significant 
+> !       obstruction between the source of the light (the two stars) 
+> !       and scattering medium. Only the radiative transfer along 
+> !       the line of sight is solved. It means that objects could make 
+> !       eclipses along the line of sight but would cast no shadows 
+> !       into other directions (i.e. would be transparent when 
+> !       considering scattered light from the two stars). 
+> !       To allow objects to cast shadows we introduced a 3D field 
+> !       where the user can specify whether a certain space point
+> !       is in the shadow so that only scattering from the unobscured 
+> !       source (star) is taken into account.
+> !         Input variables which are supposed to be components of a unit
+1064c1125
+< 	read(9,*)dd
+---
+> 	read(9,*)dd,vgamma
+1085c1146
+<         read(9,*)istar,icomp,ienv,ispot,ism,iring,idisc
+---
+>         read(9,*)istar,icomp,ispot,ism,iring,idisc,ienv
+1118,1122d1178
+< 	read(9,*)emen,qqen,aen,ffen,hen
+< 	read(9,*)
+< 	read(9,*)tempen,densen,aneen,vtrben,dstden,dstten
+< 	read(9,*)
+< 	read(9,*)
+1170a1227,1231
+> 	read(9,*)
+> 	read(9,*)
+> 	read(9,*)emen,qqen,aen,ffen,hen
+> 	read(9,*)
+> 	read(9,*)tempen,densen,aneen,vtrben,dstden,dstten        
+1175c1236,1240
+<         read(9,*)hinvnb,tinvnb,hwindnb,idennb
+---
+>         read(9,*)iinvnb,hinvnb,tinvnb
+> 	read(9,*)
+>         read(9,*)hwindnb,idennb,hcnb
+> 	read(9,*)
+> 	read(9,*)ishdnb,hshdnb
+1181c1246
+<         read(9,*)tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb,hmulnb
+---
+>         read(9,*)tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb
+1199c1264,1266
+<         read(9,*)ajet,rinjt,routjt,vjt
+---
+>         read(9,*)ajet,rinjt,routjt
+>         read(9,*)
+>         read(9,*)xjt,yjt,zjt
+1202a1270,1271
+>         read(9,*)ivjt,vjt,eveljt,rcjt
+>         read(9,*)
+1245c1314,1315
+<           call exit(1)
+---
+>           write(3,*)' 1 error: nbodfa,nboda, stop'
+> 	   call exit(1)
+1267a1338,1340
+> 	  write(3,*)' 1 error: bf space dimension exceeded, stop'
+> 	  write(3,*)'ndimf1 ndimf2 ndimf3  (body frozen grid)'
+> 	  write(3,'(4i5)')ndimf1,ndimf2,ndimf3
+1273a1347,1349
+> 	  write(3,*)' 1 error: ls space dimension exceeded, stop'
+>  	  write(3,*)'ndim1 ndim2 ndim3  (line of sight grid)'
+> 	  write(3,'(4i5)')ndim1,ndim2,ndim3
+1275a1352
+> 	if(loglam.ne.2)then
+1278a1356,1357
+> 	  write(3,*)' 1 error: nfreq>mfreq dimension exceeded, stop'
+> 	  write(3,*)' nfreq, mfreq=',nfreq,mfreq
+1280a1360,1361
+> 	endif		
+> !	create the set of lambda's	
+1285c1366
+<         else
+---
+>         elseif(loglam.eq.1)then
+1290a1372,1386
+> 	else
+> !         including loglam.eq.2
+> 	  write(*,*)' reading file lambda'
+> 	  open(15,file='lambda',status='old')
+> 	  i=1
+> 11	  read(15,*,err=13,end=13)alam(i)
+> 	  i=i+1
+> 	  if(i.gt.mfreq)then
+> 	    write(*,*)' max. nfreq i.e. mfreq reached'
+> 	    goto 13
+> 	  endif		
+> 	  goto 11
+> 13	  nfreq=i-1
+> 	  close(15)
+> 	  write(*,*)' nfreq=',nfreq
+1291a1388
+> !	phases        
+1299,1302d1395
+<           if (i.gt.mphase) then
+<             write(*,*) ' Error: Number of phases .gt. mphase = ', mphase
+<             call exit(4)
+<           endif
+1356a1450,1453
+> 	xjt=xjt*rsol
+> 	yjt=yjt*rsol
+> 	zjt=zjt*rsol
+> 	rcjt=rcjt*rsol
+1397a1495
+> 	vgamma=1.d5*vgamma
+1468a1567,1570
+> !	shift lambda's by the gamma velocity
+>         do i=1,nfreq
+>           alam(i)=alam(i)-vgamma/clight*alam(i)
+>         enddo
+1473c1575,1576
+<             call exit(1)  
+---
+>             write(3,*)' 1 error: inconsistent star/companion input data'
+> 	    call exit(1)
+1478c1581,1582
+<           call exit(1)
+---
+>           write(3,*)' 1 error: wrong densdc or edendc, stop'
+> 	  call exit(1)
+1482c1586,1587
+<           call exit(1)
+---
+>           write(3,*)' 1 error: wrong densnb or edennb, stop'
+> 	  call exit(1)
+1486c1591,1592
+<           call exit(1)
+---
+>           write(3,*)' 1 error: wrong densuf or edenuf, stop'
+> 	  call exit(1)
+1490c1596,1597
+<           call exit(1)
+---
+>           write(3,*)' 1 error: wrong ishell or denssh, stop'
+> 	  call exit(1)
+1495c1602,1603
+<           call exit(1)
+---
+>           write(3,*)' 1 error: rstar-tstar, stop'
+> 	  call exit(1)
+1500c1608,1609
+<           call exit(1)
+---
+>           write(3,*)' 1 error: rcp-tempcp, stop'
+> 	  call exit(1)
+1504c1613,1614
+<           call exit(1)
+---
+>           write(3,*)' 1 error: rdc, rindc, itdc, stop (T-singularity)'
+> 	  call exit(1)
+1508c1618,1619
+<           call exit(1)
+---
+>           write(3,*)' 1 error: ruf, rinuf, ituf, stop (T-singularity)'
+> 	  call exit(1)
+1512c1623,1624
+<           call exit(1)
+---
+>           write(3,*)' 1 error: rmd(xyz)(21)'
+> 	  call exit(1)
+1516c1628,1629
+<           call exit(1)
+---
+>           write(3,*)' 1 error: rmdf(xyz)(21)'
+> 	  call exit(1)
+1519a1633
+> 	  write(3,*)' 1 error: unit vector'
+1523a1638
+> 	  write(3,*)' 1 error: limb darkening'
+1527a1643
+> 	  write(3,*)' 1 error: limb darkening'
+1531a1648
+> 	  write(3,*)' 1 error: v1sm or v2sm<=0'
+1535a1653,1663
+> 	  write(3,*)' 1 error: Mie scattering'
+> 	  call exit(1)
+> 	endif
+> 	if(ivjt.eq.2.and.rcjt.ge.rinjt)then
+> 	  write(*,*)' error: jet density singularity'
+> 	  write(3,*)' 1 error: jet density sigularity'
+> 	  call exit(1)
+> 	endif
+> 	if(ishell.eq.3.and.rcsh.ge.rinsh)then
+> 	  write(*,*)' error: shell density singularity'
+> 	  write(3,*)' 1 error: shell density sigularity'
+1536a1665,1672
+> 	endif
+> 	if(v1fw*v2fw.lt.0.d0.or.v1sm*v2sm.lt.0.d0)then
+> 	  write(*,*)' error: wrong stream velocities'
+> 	  write(3,*)' 1 error: wrong stream velocities'
+> 	  call exit(1)
+> 	endif
+> 	if(irotat.eq.0)then
+> 	  write(*,*)' warning: irotat=0 does not support shadows'
+1553c1689,1690
+<           call exit(1)
+---
+>           write(3,*)' 1 error: alb**, ht**, stop (albedo-heat transp.)'
+> 	  call exit(1)
+1559c1696,1697
+<           call exit(1)
+---
+>           write(3,*)' 1 error: alb**, ht**, stop (albedo-heat transp.)'
+> 	  call exit(1)
+1573,1574c1711,1712
+<           call xsec(alam1,alamn,cutoff,xsecx,xsecy,txsec,nxsec,ntxsec   &
+<      &    ,amixr)
+---
+>           call xsec(alam(1),alam(nfreq),cutoff,xsecx,xsecy,txsec        &
+>      &    ,nxsec,ntxsec,amixr)
+1583,1584c1721
+<      &  ,lunt1,lunt2,lunt3,dlst,dlst2,dlcp,dlcp2                        &
+<      &  ,alam1,alamn)
+---
+>      &  ,lunt1,lunt2,lunt3,dlst,dlst2,dlcp,dlcp2,alam,nfreq)
+1613c1750
+< !	ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt are 
+---
+> !	ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt,kshade are 
+1624c1761,1762
+< !	atemp,adens,ane,avr,avt,avz,avtrb,adustd,adustt are 
+---
+> !         kshade -integer describing shadows (scattering from 2 stars)
+> !	atemp,adens,ane,avr,avt,avz,avtrb,adustd,adustt,lshade are 
+1647,1648c1785,1786
+<      &   ,inebl,aneb,rinnb,routnb,emnb,rnb                              &
+<      &   ,hinvnb,tinvnb,hwindnb,ndennb,denxnb,denznb                    &
+---
+>      &   ,inebl,aneb,rinnb,routnb,emnb,rnb,hcnb,ishdnb,hshdnb           &
+>      &   ,hinvnb,tinvnb,iinvnb,hwindnb,ndennb,denxnb,denznb             &
+1650,1651c1788
+<      &   ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb,hmulnb          &
+<      &   ,dstdnb,dsttnb                                                 &
+---
+>      &   ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb,dstdnb,dsttnb   &
+1661c1798,1799
+<      &   ,ajet,rinjt,routjt,vjt,xjet,yjet,zjet,vxjt,vyjt,vzjt           &
+---
+>      &   ,ajet,rinjt,routjt,xjt,yjt,zjt,xjet,yjet,zjet                  &
+>      &   ,ivjt,vjt,eveljt,rcjt,vxjt,vyjt,vzjt                           &
+1666c1804,1805
+<      &   ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt)
+---
+>      &   ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt   &
+>      &   ,kshade)
+1672c1811,1812
+<            call exit(1)
+---
+>            write(3,*)' 1 error: imodel2 vs nbodfb'
+> 	  call exit(1)	
+1678c1818,1819
+<      &    ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt)
+---
+>      &    ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt  &
+>      &    ,kshade)
+1729c1870,1871
+< !		linear interpolation
+---
+> !		linear interpolation 
+> !             (does not support shadows and sets lshade=3)
+1738,1739c1880,1881
+<      &        ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb          &
+<      &        ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb)
+---
+>      &        ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb,lshade   &
+>      &        ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb,kshade)
+1741c1883
+< !		nearest neighbour approximation
+---
+> !		nearest neighbour approximation (supports shadows)
+1749,1750c1891,1892
+<      &        ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb          &
+<      &        ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb)
+---
+>      &        ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb,lshade   &
+>      &        ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb,kshade)
+1794a1937
+> 		mshade(kk-ivac1+1)=lshade(kk)
+1838c1981,1982
+<      &        ,temp,ekonc,akonc,dens,dustd,dustt,hi,hneg,h2,hei,hipf)
+---
+>      &        ,temp,ekonc,akonc,dens,dustd,dustt,mshade                 &
+>      &        ,hi,hneg,h2,hei,hipf)
+1846c1990
+< 	      do 230 ilin=1,nline
+---
+> 	      do ilin=1,nline
+1853c1997
+< 	        do 200 ll=1,mion-1
+---
+> 	        do ll=1,mion-1
+1855c1999
+< 200	        continue
+---
+> 	        enddo
+1859c2003
+< 	        do 210 kk=1,nivac
+---
+> 	        do kk=1,nivac
+1863c2007
+< 210	        continue
+---
+> 	        enddo
+1867c2011
+<                 do 220 kk=1,nivac
+---
+>                 do kk=1,nivac
+1873c2017
+< 220             continue
+---
+>                 enddo
+1881c2025
+< 230	      continue
+---
+> 	      enddo
+1957c2101
+<      &        ,temp,dens,ekonc,akonc,dustd,dustt,azn,vr,vt,vz           &
+---
+>      &        ,temp,dens,ekonc,akonc,dustd,dustt,azn,vr,vt,vz,mshade    &
+1959a2104
+> !             end freq cycle 
+1960a2106
+> !           end x-y cycle
+1965a2112
+> !	  write fort* files with 2D images
+1984a2132
+> !	  integrate flux over the 2D surface
+1997a2146
+> !	    alamg -lambda's shifted by gamma velocity [Ang]
+2007,2009c2156,2160
+< 	    dvel=(alam(nu)-refw)/refw*clight*1.d-5
+<             write(4,510)alam(nu),dvel,flux(nu,iang),fluxl,fluxn(nu,iang)&
+<      &      ,fluxs
+---
+> 	    alamg=alam(nu)+vgamma/clight*alam(nu)
+> 	    dvel=(alamg-refw)/refw*clight*1.d-5
+> !	    shifts lambda & writes shellspectrum
+>             write(4,510)alamg,dvel,flux(nu,iang),fluxl                  &
+>      &      ,fluxn(nu,iang),fluxs
+2012,2013c2163,2165
+<             write(11,'(f7.3,es11.3,f10.4,es12.4,es18.9e3)')alpha(iang)/ &
+<      &      2.d0/pi,dvel,-2.5d0*dlog10(fluxl),alam(nu),flux(nu,iang)
+---
+> !	    writes ligtcurve
+>             write(11,530)alpha(iang)/2.d0/pi,dvel                       &
+>      &      ,-2.5d0*dlog10(fluxl),alamg,flux(nu,iang)
+2018c2170,2171
+< 510     format(f12.3,1x,f10.1,5es14.5e3)	  
+---
+> 510       format(f12.3,1x,f10.1,5es14.5e3)
+> 530 	  format(f7.3,es11.3,f10.4,es12.4,es18.9e3)
+2026a2180
+> 	write(3,*)' 0 errors found'
+2028c2182
+< !	close(3)
+---
+> 	close(3)
+2033,2057c2187,2198
+<         call exit(0)
+< 	end program SHELLSPEC
+< !-----------------------------------------------------------------------
+<         subroutine exit(exitcode)
+< !
+< ! the simplest exit (but one can add something in the future)
+< !
+< ! input:
+< !   exitcode ... dtto
+< !
+< !   0 ... success
+< !   1 ... error reading input parameters
+< !   2 ... convergence problems during RTE integration
+< !   3 ... interpolation or extrapolation problems
+< !   4 ... array dimensions too small
+< !
+<         implicit none
+<         integer exitcode
+<         if (exitcode.eq.4) then
+<           stop 4
+<         else if (exitcode.eq.3) then
+<           stop 3
+<         else if (exitcode.eq.2) then
+<           stop 2
+<         else if (exitcode.eq.1) then
+---
+> 	call exit(0)
+> !	end program SHELLSPEC
+> 	end subroutine SHELLSPEC
+> !-----------------------------------------------------------------------
+> 	subroutine exit(icode)
+> !	icode=0 no error was detected
+> !	icode><0 some error or warning was detected
+> !	check the error file or screen for more detailes
+> 	implicit none
+>         integer, parameter:: i4=4,i8=8
+> 	integer:: icode
+> 	if(icode.ne.0) then
+2062c2203
+<         end
+---
+> 	end
+2074c2215
+<      &  ,temp,dens,ekonc,akonc,dustd,dustt,az,vr,vt,vz                  &
+---
+>      &  ,temp,dens,ekonc,akonc,dustd,dustt,az,vr,vt,vz,mshade           &
+2120a2262,2266
+> !         mshade - shadows
+> !         mshade=1 scattering only from the central star
+> !         mshade=2 scattering only from the companion star
+> !         mshade=3 scattering from both stars (default)
+> !         mshade=0 no scattering
+2136c2282
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+2143a2290
+>         integer(i1):: mshade(ndim)
+2276c2423,2424
+< 	    write(*,*)'error: zero opacity'
+---
+> 	    write(*,*)' error: zero opacity'
+> 	    write(3,*)' 1 error: zero opacity'
+2280c2428
+< 	    call exit(2)
+---
+> 	    call exit(1)
+2294c2442,2443
+< 	    if(istar.gt.0)then	
+---
+> 	    if(istar.gt.0.and.(mshade(id1).eq.1.or.mshade(id1).eq.3))   &
+>      &      then	
+2330c2479
+<      	    if(icomp.gt.0)then  	
+---
+>      	    if(icomp.gt.0.and.mshade(id1).eq.2)then  	
+2658,2659c2807,2808
+< !        WRITE (2,'(A)')' PARTITION FUNCTIONS'
+< !        WRITE (2,'(A,20I10)')' TEMP',(I,I=1,NION)
+---
+> !        WRITE(2,'(A)')' PARTITION FUNCTIONS'
+> !        WRITE(2,'(A,20I10)')' TEMP',(I,I=1,NION)
+2716,2717c2865,2866
+< !        WRITE (2,'(A)')' PARTITION FUNCTIONS'
+< !        WRITE (2,'(A,20I10)')' TEMP',(I,I=1,NION)
+---
+> !        WRITE(2,'(A)')' PARTITION FUNCTIONS'
+> !        WRITE(2,'(A,20I10)')' TEMP',(I,I=1,NION)
+3163c3312,3313
+< 	      call exit(2)
+---
+>               write(3,*)' 1 error iion>nion'
+> 	      call exit(1)
+3166,3167c3316,3318
+< 	      write(*,*)i,'-th sp. line, partition func. not available'
+<               write(*,*)', p.f. will be set=1, warning'
+---
+> 	      write(*,*)i,'-th sp. line, partition f. not available,'
+>               write(*,*)' warning: p.f. will be set=1'
+>               write(3,*)' 1 warning: p.f. will be set=1'
+3473,3474c3624,3625
+<      &  ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb                &
+<      &  ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb)
+---
+>      &  ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb,lshade         &
+>      &  ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb,kshade)
+3481a3633
+> !	Note: shadows are not supported/interpolated and lshade=3
+3491c3643
+< !	  ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb -model
+---
+> !	  ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb,kshade -model
+3493c3645,3646
+< !	  atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb- rotated model
+---
+> !	  atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb,lshade
+> !         (^rotated model^)
+3499c3652
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+3511a3665
+> 	integer(i1):: kshade(ndimf1,ndimf2,ndimf3),lshade(ndim3)
+3546a3701
+> 	        write(3,*)' 1 compiler/maschine dependent error'
+3555a3711
+> 	        write(3,*)' 1 compiler/maschine dependent error'
+3564a3721
+> 	        write(3,*)' 1 compiler/maschine dependent error'
+3596a3754
+> 		  lshade(k)=3
+3682a3841
+> 	    lshade(k)=3
+3692a3852
+> 	    lshade(k)=3
+3723,3724c3883,3884
+<      &  ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb                &
+<      &  ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb)
+---
+>      &  ,atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb,lshade         &
+>      &  ,ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb,kshade)
+3740c3900
+< !	  ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb -model
+---
+> !	  ftemp,fdustt,fdustd,fdens,fne,fvr,fvt,fvz,fvtrb,kshade -model
+3742c3902,3903
+< !         atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb- rotated model
+---
+> !         atemp,adustt,adustd,adens,ane,avr,avt,avz,avtrb,lshade
+> !         (^rotated model^)
+3746d3906
+< !	parameter (ndim1=100,ndim2=100,ndim3=200)
+3748c3908
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+3760a3921
+> 	integer(i1):: kshade(ndimf1,ndimf2,ndimf3),lshade(ndim3)
+3792a3954
+> 	      write(3,*)' 1 compiler/maschine dependent error'
+3797a3960
+> 	      write(3,*)' 1 compiler/maschine dependent error'
+3802a3966
+> 	      write(3,*)' 1 compiler/maschine dependent error'
+3823a3988
+> 		lshade(k)=kshade(ii1,jj1,kk1)
+3829a3995
+> !		out of body frozen grid
+3838a4005
+> 	    lshade(k)=0	
+3935c4102,4103
+<      &  ,temp,ekonc,akonc,dens,dustd,dustt,hi,hneg,h2,hei,hipf)
+---
+>      &  ,temp,ekonc,akonc,dens,dustd,dustt,mshade                       &
+>      &  ,hi,hneg,h2,hei,hipf)
+3939c4107
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+3945a4114
+> 	integer(i1):: mshade(ndim3)
+3955c4124
+<      &        ,'       az'
+---
+>      &        ,'       az      mshade'
+3957c4126
+<           write(2,40)kk,akonc(kk),ekonc(kk),temp(kk),az(kk)
+---
+>           write(2,40)kk,akonc(kk),ekonc(kk),temp(kk),az(kk),mshade(kk)
+3959c4128
+< 40      format(i4,4es11.3)
+---
+> 40      format(i4,4es11.3,i3)
+3988,3989c4157,4158
+<         WRITE (2,'(A)')' PARTITION FUNCTIONS'
+<         WRITE (2,'(A,20I10)')' TEMP',(kk,kk=1,NION)
+---
+>         WRITE(2,'(A)')' PARTITION FUNCTIONS'
+>         WRITE(2,'(A,20I10)')' TEMP',(kk,kk=1,NION)
+4033,4034c4202,4203
+<      &  ,inebl,aneb,rinnb,routnb,emnb,rnb                               &
+<      &  ,hinvnb,tinvnb,hwindnb,ndennb,denxnb,denznb                     &
+---
+>      &  ,inebl,aneb,rinnb,routnb,emnb,rnb,hcnb,ishdnb,hshdnb            &
+>      &  ,hinvnb,tinvnb,iinvnb,hwindnb,ndennb,denxnb,denznb              &
+4036,4037c4205
+<      &  ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb,hmulnb           &
+<      &  ,dstdnb,dsttnb                                                  &
+---
+>      &  ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb,dstdnb,dsttnb    &
+4047c4215,4216
+<      &  ,ajet,rinjt,routjt,vjt,xjet,yjet,zjet,vxjt,vyjt,vzjt            &
+---
+>      &  ,ajet,rinjt,routjt,xjt,yjt,zjt,xjet,yjet,zjet                   &
+>      &  ,ivjt,vjt,eveljt,rcjt,vxjt,vyjt,vzjt                            &
+4052c4221,4222
+<      &  ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt)
+---
+>      &  ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt    &
+>      &  ,kshade)
+4054c4224
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+4058,4059c4228,4229
+< 	integer:: itrg,idisc,itdc,inebl,ndennb,itnb,ism,iflow,iufo,ituf
+< 	integer:: ijet,ishell
+---
+> 	integer:: itrg,idisc,itdc,inebl,ndennb,iinvnb,itnb,ishdnb
+> 	integer:: ism,iflow,iufo,ituf,ijet,ivjt,ishell
+4066a4237
+>         integer(i1):: kshade(ndimf1,ndimf2,ndimf3)
+4093c4264
+<         real(i8):: aneb,rinnb,routnb,emnb,rnb
+---
+>         real(i8):: aneb,rinnb,routnb,emnb,rnb,hcnb,hshdnb
+4096,4097c4267
+<         real(i8)::tempnb,densnb,anenb,vtrbnb,edennb,etmpnb,hmulnb
+<         real(i8):: dstdnb,dsttnb
+---
+>         real(i8)::tempnb,densnb,anenb,vtrbnb,edennb,etmpnb,dstdnb,dsttnb
+4107c4277,4279
+<         real(i8):: ajet,rinjt,routjt,vjt,xjet,yjet,zjet,vxjt,vyjt,vzjt
+---
+>         real(i8):: ajet,rinjt,routjt
+>         real(i8):: xjt,yjt,zjt,xjet,yjet,zjet
+>         real(i8):: vjt,eveljt,rcjt,vxjt,vyjt,vzjt
+4132a4305,4309
+> !       kshade - shadows (i.e. scattering from the two stars)
+> !       kshade=1 scattering only from the central star
+> !       kshade=2 scattering only from the companion star
+> !       kshade=3 scattering from both stars (default)
+> !       kshade=0 no scattering
+4195c4372
+<      &    ,rfronp,rbackp,rpolep,rsidep,rmeanp                               &
+---
+>      &    ,rfronp,rbackp,rpolep,rsidep,rmeanp                           &
+4206c4383
+<      &    ,rfronp,rbackp,rpolep,rsidep,rmeanp                               &
+---
+>      &    ,rfronp,rbackp,rpolep,rsidep,rmeanp                           &
+4223c4400
+<      &    ,rfrons,rbacks,rpoles,rsides,rmeans                               &
+---
+>      &    ,rfrons,rbacks,rpoles,rsides,rmeans                           &
+4242c4419
+<      &    ,rfrone,rbacke,rpolee,rsidee,rmeane                               &
+---
+>      &    ,rfrone,rbacke,rpolee,rsidee,rmeane                           &
+4250c4427
+<      &    ,rfrone,rbacke,rpolee,rsidee,rmeane                               &
+---
+>      &    ,rfrone,rbacke,rpolee,rsidee,rmeane                           &
+4290c4467
+< 	if(inebl.eq.4)then
+---
+> 	if(inebl.eq.1)then
+4326a4504,4506
+> 	  xjet=xjet/unjet
+> 	  yjet=yjet/unjet
+> 	  zjet=zjet/unjet  
+4356,4358c4536,4537
+< !	The model with a star, companion, and possible: 
+< !	spot, stream, ring, disc, nebula, flow, jet, ufo, shell, 
+< !       and background
+---
+> !	The model with a star, companion, and other objects.
+> !	The order of objects defines their priority. 
+4364a4544,4545
+> !	      default scattering from both stars:
+> 	      kshade(i,j,k)=3	
+4417,4425d4597
+< !			inside the envelope
+<               call envelope(ienv,rosue(i,j),hen,xen,yen,zen             &
+<      &        ,vxen,vyen,vzen,omgen,inx                                 &
+<      &        ,tempen,dstden,dstten,densen,aneen,vtrben                 &
+<      &        ,far(i),fat(j),faz(k)                                     &
+<      &        ,ftemp(i,j,k),fdens(i,j,k),fne(i,j,k)                     &
+<      &        ,fdustd(i,j,k),fdustt(i,j,k)                              &
+<      &        ,fvr(i,j,k),fvt(i,j,k),fvz(i,j,k),fvtrb(i,j,k))
+< 	      if(inx.eq.1)goto 40
+4480a4653,4661
+> !			inside the envelope
+>               call envelope(ienv,rosue(i,j),hen,xen,yen,zen             &
+>      &        ,vxen,vyen,vzen,omgen,inx                                 &
+>      &        ,tempen,dstden,dstten,densen,aneen,vtrben                 &
+>      &        ,far(i),fat(j),faz(k)                                     &
+>      &        ,ftemp(i,j,k),fdens(i,j,k),fne(i,j,k)                     &
+>      &        ,fdustd(i,j,k),fdustt(i,j,k)                              &
+>      &        ,fvr(i,j,k),fvt(i,j,k),fvz(i,j,k),fvtrb(i,j,k))
+> 	      if(inx.eq.1)goto 40
+4483,4484c4664,4665
+<      &        ,aneb,rinnb,routnb,emnb,rnb                               &
+<      &        ,hinvnb,tinvnb,hwindnb,ndennb,denxnb,denznb               &
+---
+>      &        ,aneb,rinnb,routnb,emnb,rnb,hcnb,ishdnb,hshdnb            &
+>      &        ,hinvnb,tinvnb,iinvnb,hwindnb,ndennb,denxnb,denznb        &
+4486c4667
+<      &        ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb,hmulnb     &
+---
+>      &        ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb            &
+4491c4672
+<      &        ,fdustd(i,j,k),fdustt(i,j,k)                              &
+---
+>      &        ,fdustd(i,j,k),fdustt(i,j,k),kshade(i,j,k)                &
+4505,4508c4686,4690
+<               call sjet(ijet,ajet,rinjt,routjt,xjet,yjet,zjet           &
+<      &        ,vjt,vxjt,vyjt,vzjt,vtrbjt,tempjt,densjt,anejt            &
+<      &        ,dstdjt,dsttjt                                            &
+<      &        ,far(i),fat(j),faz(k),unjet,er,inx                        &
+---
+>               call sjet(ijet,ajet,rinjt,routjt                          &
+>      &        ,xjt,yjt,zjt,xjet,yjet,zjet                               &
+>      &        ,ivjt,vjt,eveljt,rcjt,vxjt,vyjt,vzjt,vtrbjt               &
+>      &        ,tempjt,densjt,anejt,dstdjt,dsttjt                        &
+>      &        ,far(i),fat(j),faz(k),inx                                 &
+4560,4562c4742,4744
+< !          write(10,'(9es11.3)')ftemp(i,j,k),fdustt(i,j,k),fdustd(i,j,k)&
+< !     &    ,fdens(i,j,k),fne(i,j,k)                                     &
+< !     &    ,fvr(i,j,k),fvt(i,j,k),fvz(i,j,k),fvtrb(i,j,k)
+---
+> !          write(10,'(9es11.3,i3)')ftemp(i,j,k)                         &
+> !     &    ,fdustt(i,j,k),fdustd(i,j,k),fdens(i,j,k),fne(i,j,k)         &
+> !     &    ,fvr(i,j,k),fvt(i,j,k),fvz(i,j,k),fvtrb(i,j,k),kshade(i,j,k)
+4567,4568c4749,4750
+< 	if(inebl.eq.4)then
+< 	  write(2,110)' inebl=4= pp-disk'
+---
+> 	if(inebl.eq.1)then
+> 	  write(2,110)' inebl=1= pp-disk'
+4579c4761,4762
+<      &  ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt)
+---
+>      &  ,far,fat,faz,ftemp,fdens,fne,fvr,fvt,fvz,fvtrb,fdustd,fdustt    &
+>      &  ,kshade)
+4581c4764
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+4589a4773
+>         integer(i1):: kshade(ndimf1,ndimf2,ndimf3)
+4598a4783,4787
+> !       kshade - shadows 
+> !       kshade=1 scattering only from the central star
+> !       kshade=2 scattering only from the companion star
+> !       kshade=3 scattering from both stars (default)
+> !       kshade=0 no scattering
+4602c4791,4792
+< 	  call exit(4)
+---
+> 	  write(3,*)' 1 error: space dimension exceeded, stop'
+> 	  goto 100
+4612c4802
+<      &    ,fvr(i,j,k),fvt(i,j,k),fvz(i,j,k),fvtrb(i,j,k)
+---
+>      &    ,fvr(i,j,k),fvt(i,j,k),fvz(i,j,k),fvtrb(i,j,k),kshade(i,j,k)
+4955a5146
+> !	place these 4 lines inside the if blocks?? to speed up
+5061,5067c5252,5258
+<         subroutine nebula(iufo,xufo,yufo,zufo                           &
+<      &  ,aufo,rinuf,routuf,emuf,ruf                                     &
+<      &  ,hinvnb,tinvnb,hwindnb,ndennb,denxnb,denznb                     &
+<      &  ,vxuf,vyuf,vzuf,trmtuf                                          &
+<      &  ,tempuf,densuf,aneuf,vtrbuf,edenuf,ituf,etmpuf,hmulnb           &
+<      &  ,dstduf,dsttuf                                                  &
+<      &  ,far,fat,faz,er,inuf                                            &
+---
+>         subroutine nebula(inebl,xneb,yneb,zneb                          &
+>      &  ,aneb,rinnb,routnb,emnb,rnb,hcnb,ishdnb,hshdnb                  &
+>      &  ,hinvnb,tinvnb,iinvnb,hwindnb,ndennb,denxnb,denznb              &
+>      &  ,vxnb,vynb,vznb,trmtnb                                          &
+>      &  ,tempnb,densnb,anenb,vtrbnb,edennb,itnb,etmpnb                  &
+>      &  ,dstdnb,dsttnb                                                  &
+>      &  ,far,fat,faz,er,innb                                            &
+5070c5261
+<      &  ,fdustd,fdustt                                                  &
+---
+>      &  ,fdustd,fdustt,kshade                                           &
+5072,5074c5263,5269
+< !	output: hsca00,hsca01,sig00,sig01,soun01,inuf
+< !	disk=ufo
+< !	trmtuf is transformation matrix
+---
+> !       protoplanetary or accretion disk
+> !       input: emnb, rnb -mass and radius of the central object
+> !	output: hsca00,hsca01 -vertical presure scale height
+> !         sig00,sig01 -surface density at rin, rout
+> !         soun01 -speed of sound
+> !         innb -indicator that state quantities were updated
+> !	trmtnb is transformation matrix
+5076c5271
+<         integer, parameter:: i4=4,i8=8
+---
+>         integer, parameter:: i1=1,i4=4,i8=8
+5078,5082c5273,5277
+< 	real(i8):: trmtuf(3,3),denxnb(mstarx),denznb(mstarx)
+< 	real(i8):: xufo,yufo,zufo,aufo,rinuf,routuf,emuf,ruf
+< 	real(i8):: hinvnb,tinvnb,hwindnb,vxuf,vyuf,vzuf
+< 	real(i8):: tempuf,densuf,aneuf,vtrbuf,edenuf,etmpuf,hmulnb
+< 	real(i8):: dstduf,dsttuf,far,fat,faz,er
+---
+> 	real(i8):: trmtnb(3,3),denxnb(mstarx),denznb(mstarx)
+> 	real(i8):: xneb,yneb,zneb,aneb,rinnb,routnb,emnb,rnb
+> 	real(i8):: hinvnb,tinvnb,hwindnb,vxnb,vynb,vznb,hcnb,hshdnb
+> 	real(i8):: tempnb,densnb,anenb,vtrbnb,edennb,etmpnb
+> 	real(i8):: dstdnb,dsttnb,far,fat,faz,er
+5085c5280,5281
+< 	integer:: iufo,ndennb,ituf,inuf
+---
+> 	integer(i1):: kshade
+> 	integer:: inebl,ndennb,iinvnb,ishdnb,itnb,innb
+5094c5290
+< 	if(iufo.eq.4)then	
+---
+> 	if(inebl.eq.1)then	
+5097,5099c5293,5295
+< 	  ffx=trmtuf(1,1)*far+trmtuf(1,2)*fat+trmtuf(1,3)*faz
+< 	  ffy=trmtuf(2,1)*far+trmtuf(2,2)*fat+trmtuf(2,3)*faz
+< 	  ffz=trmtuf(3,1)*far+trmtuf(3,2)*fat+trmtuf(3,3)*faz
+---
+> 	  ffx=trmtnb(1,1)*far+trmtnb(1,2)*fat+trmtnb(1,3)*faz
+> 	  ffy=trmtnb(2,1)*far+trmtnb(2,2)*fat+trmtnb(2,3)*faz
+> 	  ffz=trmtnb(3,1)*far+trmtnb(3,2)*fat+trmtnb(3,3)*faz
+5102,5106c5298,5302
+< !	  define mid plane temperature temp0 depending on ituf          
+<           if(ituf.eq.1)then
+< 	    temp0=tempuf
+< 	  elseif(ituf.eq.2)then
+< 	    ratio=ruf/erxy
+---
+> !	  define mid plane temperature temp0 depending on itnb          
+>           if(itnb.eq.1)then
+> 	    temp0=tempnb
+> 	  elseif(itnb.eq.2)then
+> 	    ratio=rnb/erxy
+5108c5304
+< 	    temp0=tempuf*ratio**0.75d0*pom
+---
+> 	    temp0=tempnb*ratio**0.75d0*pom
+5110,5111c5306,5307
+< 	    ratio=erxy/rinuf
+< 	    temp0=tempuf*ratio**etmpuf
+---
+> 	    ratio=erxy/rinnb
+> 	    temp0=tempnb*ratio**etmpnb
+5113c5309,5310
+< !         monoatommic=5/3, diatomic=7/5, m(H2)=2, m(He)=4
+---
+> !         monoatommic=5/3, diatomic=7/5, many degrees of freedom=1
+> !         m(H2)=2, m(He)=4
+5119c5316,5317
+<           vuf0=dsqrt(grav*emuf/erxy)
+---
+> !	  velocity in cylindrical coord.
+>           vuf0=dsqrt(grav*emnb/erxy)
+5121,5122c5319,5322
+<           hscale=hmulnb*sound/vuf0*erxy
+< !??	  z=hscale*4 corresponds to 10^-4 drop in density          
+---
+>           hscale=sound/vuf0*erxy*hcnb
+> !??	  z=hscale*2 corresponds to 10^-1 drop in density          
+> !	  z=hscale*3 corresponds to 10^-2 drop in density          
+> !	  z=hscale*4 corresponds  3x10^-4 drop in density          
+5126c5326,5327
+< !         *00 -quantity at rinuf, *01 -quantity at routuf
+---
+> !	  vuf* -Keplerian velocity
+> !         *00 -quantity at rinnb, *01 -quantity at routnb
+5129c5330,5331
+<           if(erxy.gt.rinuf.and.erxy.lt.routuf.and.erz.lt.hscale*aufo)   &
+---
+> !	  inside the nebula:
+>           if(erxy.gt.rinnb.and.erxy.lt.routnb.and.erz.lt.hscale*aneb)   &
+5131c5333
+< 	    if(ituf.eq.1)then
+---
+> 	    if(itnb.eq.1)then
+5133,5139c5335,5341
+< 	      ftem00=tempuf
+< 	      ftem01=tempuf	
+< 	      ftemp=tempuf
+< 	      fdustt=dsttuf
+< 	    elseif(ituf.eq.2)then
+< !		radially dependent temperatures	    
+< 	      ratio=ruf/rinuf
+---
+> 	      ftem00=tempnb
+> 	      ftem01=tempnb	
+> 	      ftemp=tempnb
+> 	      fdustt=dsttnb
+> 	    elseif(itnb.eq.2)then
+> !		radially dependent temperatures (Pringle 1981)	    
+> 	      ratio=rnb/rinnb
+5141,5142c5343,5344
+< 	      ftem00=tempuf*ratio**0.75d0*pom
+< 	      ratio=ruf/routuf
+---
+> 	      ftem00=tempnb*ratio**0.75d0*pom
+> 	      ratio=rnb/routnb
+5144,5145c5346,5347
+< 	      ftem01=tempuf*ratio**0.75d0*pom
+< 	      ratio=ruf/erxy
+---
+> 	      ftem01=tempnb*ratio**0.75d0*pom
+> 	      ratio=rnb/erxy
+5147,5148c5349,5350
+< 	      ftemp=tempuf*ratio**0.75d0*pom
+< 	      fdustt=dsttuf*ratio**0.75d0*pom
+---
+> 	      ftemp=tempnb*ratio**0.75d0*pom
+> 	      fdustt=dsttnb*ratio**0.75d0*pom
+5150,5154c5352,5356
+< !	      radial & vertical temperature dependence	    
+< 	      ftem00=tempuf
+< 	      ratio=routuf/rinuf
+< 	      ftem01=tempuf*ratio**etmpuf
+< 	      ratio=erxy/rinuf
+---
+> !	      radial power law & vertical temperature dependence	    
+> 	      ftem00=tempnb
+> 	      ratio=routnb/rinnb
+> 	      ftem01=tempnb*ratio**etmpnb
+> 	      ratio=erxy/rinnb
+5156c5358
+< 	      ftemp0=tempuf*ratio**etmpuf
+---
+> 	      ftemp0=tempnb*ratio**etmpnb
+5160,5164c5362,5369
+< ! sudden jump
+< 	        ftemp=tinvnb*ftemp0
+< ! linear increase; modified by MB Dec 8th 2017
+< !                ftemp=ftemp0+(tinvnb*ftemp0-ftemp0)                     &
+< !     &            *(erz-hscale*hinvnb)/(hscale*aufo-hscale*hinvnb) 
+---
+> 		if(iinvnb.eq.1)then
+> 	          ftemp=tinvnb*ftemp0
+> 		elseif(iinvnb.eq.2)then
+>    		  ftemp=(tinvnb-1.d0)/(aneb-hinvnb)*ftemp0/hscale
+> 		  ftemp=ftemp*(erz-hinvnb*hscale)+ftemp0
+> 	        else
+> 		  ftemp=ftemp0
+> 		endif
+5168c5373
+< 	      fdustt=dsttuf*ratio**etmpuf
+---
+> 	      fdustt=dsttnb*ratio**etmpnb
+5172,5178c5377,5383
+< 	    vuf00=dsqrt(grav*emuf/rinuf)
+< 	    vuf01=dsqrt(grav*emuf/routuf)
+< 	    hsca00=soun00/vuf00*rinuf
+< 	    hsca01=soun01/vuf01*routuf
+< 	    sig00=densuf*hsca00*dsqrt(2.d0*pi)
+< 	    sig01=sig00*(routuf/rinuf)**edenuf
+< 	    ratio=(erxy/rinuf)**edenuf
+---
+> 	    vuf00=dsqrt(grav*emnb/rinnb)
+> 	    vuf01=dsqrt(grav*emnb/routnb)
+> 	    hsca00=soun00/vuf00*rinnb*hcnb
+> 	    hsca01=soun01/vuf01*routnb*hcnb
+> 	    sig00=densnb*hsca00*dsqrt(2.d0*pi)
+> 	    sig01=sig00*(routnb/rinnb)**edennb
+> 	    ratio=(erxy/rinnb)**edennb
+5196,5197c5401,5407
+< 	    fne=aneuf/densuf*fdens
+< 	    fdustd=dstduf/densuf*fdens
+---
+> 	    fne=anenb/densnb*fdens
+> 	    fdustd=dstdnb/densnb*fdens
+> 	    if(erz.lt.hscale*hshdnb)then
+> 	      kshade=0
+> 	    else
+> 	      kshade=ishdnb
+> 	    endif
+5199c5409
+< !	    write(19,'(6es10.2)')erxy,erz,rinuf,hscale,hsca00
+---
+> !	    write(19,'(6es10.2)')erxy,erz,rinnb,hscale,hsca00
+5201a5412,5414
+> !	    v = omega x r = omega x erxy 
+> !           but v is not the same as for the DISK since 
+> !           omega=sqrt(GM/erxy**3)
+5203,5207c5416,5420
+< 	    fvr=vuf*(yufo*faz-zufo*fat)+vxuf
+< 	    fvt=vuf*(zufo*far-xufo*faz)+vyuf
+< 	    fvz=vuf*(xufo*fat-yufo*far)+vzuf
+< 	    fvtrb=vtrbuf
+< 	    inuf=1
+---
+> 	    fvr=vuf*(yneb*faz-zneb*fat)+vxnb
+> 	    fvt=vuf*(zneb*far-xneb*faz)+vynb
+> 	    fvz=vuf*(xneb*fat-yneb*far)+vznb
+> 	    fvtrb=vtrbnb
+> 	    innb=1
+5213,5216c5426,5430
+<         subroutine sjet(ijet,ajet,rinjt,routjt,xjet,yjet,zjet           &
+<      &  ,vjt,vxjt,vyjt,vzjt,vtrbjt,tempjt,densjt,anejt                  &
+<      &  ,dstdjt,dsttjt                                                  &
+<      &  ,far,fat,faz,unjet,er,injt                                      &
+---
+>         subroutine sjet(ijet,ajet,rinjt,routjt                          &
+>      &  ,xjt,yjt,zjt,xjet,yjet,zjet                                     &
+>      &  ,ivjt,vjt,eveljt,rcjt,vxjt,vyjt,vzjt,vtrbjt                     &
+>      &  ,tempjt,densjt,anejt,dstdjt,dsttjt                              &
+>      &  ,far,fat,faz,injt                                               &
+5224,5229c5438,5445
+< 	real(i8):: ajet,rinjt,routjt,xjet,yjet,zjet
+< 	real(i8):: vjt,vxjt,vyjt,vzjt,vtrbjt,tempjt,densjt,anejt
+< 	real(i8):: dstdjt,dsttjt,far,fat,faz,unjet,er,ftemp,fdens,fne
+< 	real(i8):: fdustd,fdustt,fvr,fvt,fvz,fvtrb 
+< 	integer:: ijet,injt
+< 	real(i8):: pi,angle,rr2
+---
+> 	real(i8):: ajet,rinjt,routjt,xjt,yjt,zjt,xjet,yjet,zjet
+> 	real(i8):: dxjt,dyjt,dzjt,drjt
+> 	real(i8):: vjt,eveljt,rcjt,vxjt,vyjt,vzjt,vtrbjt
+> 	real(i8):: tempjt,densjt,anejt
+> 	real(i8):: dstdjt,dsttjt,far,fat,faz,ftemp,fdens,fne
+> 	real(i8):: fdustd,fdustt,fvr,fvt,fvz,fvtrb
+> 	integer:: ijet,injt,ivjt
+> 	real(i8):: pi,angle,rr2,vel,vel1,velr
+5232,5233c5448,5453
+< 	  angle=(xjet*far+yjet*fat+zjet*faz)/unjet/er
+< 	  angle=dacos(angle)	
+---
+> 	  dxjt=far-xjt
+> 	  dyjt=fat-yjt
+> 	  dzjt=faz-zjt
+> 	  drjt=dsqrt(dxjt*dxjt+dyjt*dyjt+dzjt*dzjt)
+> 	  angle=(xjet*dxjt+yjet*dyjt+zjet*dzjt)/drjt
+> 	  angle=dacos(angle)
+5235,5236c5455,5456
+<      &    .and.er.ge.rinjt.and.er.lt.routjt)then
+<             rr2=(rinjt/er)**2
+---
+>      &    .and.drjt.ge.rinjt.and.drjt.lt.routjt)then
+>             rr2=(rinjt/drjt)**2
+5239,5244c5459,5472
+< 	    fdustd=dstdjt*rr2
+< 	    fdens=densjt*rr2
+< 	    fne=anejt*rr2
+< 	    fvr=vjt*far/er+vxjt
+< 	    fvt=vjt*fat/er+vyjt
+< 	    fvz=vjt*faz/er+vzjt
+---
+> 	    if(ivjt.eq.2)then
+> 	      vel=vjt*(1.d0-rcjt/drjt)**eveljt
+> 	      vel1=vjt*(1.d0-rcjt/rinjt)**eveljt
+> 	    else
+> 	      vel=vjt*(drjt/rinjt)**eveljt
+> 	      vel1=vjt
+> 	    endif
+> 	    velr=vel1/vel
+> 	    fdustd=dstdjt*rr2*velr
+> 	    fdens=densjt*rr2*velr
+> 	    fne=anejt*rr2*velr
+> 	    fvr=vel*dxjt/drjt+vxjt
+> 	    fvt=vel*dyjt/drjt+vyjt
+> 	    fvz=vel*dzjt/drjt+vzjt
+5249,5250c5477,5482
+< 	  angle=(xjet*far+yjet*fat+zjet*faz)/unjet/er
+< 	  angle=dacos(angle)
+---
+> 	  dxjt=far-xjt
+> 	  dyjt=fat-yjt
+> 	  dzjt=faz-zjt
+> 	  drjt=dsqrt(dxjt*dxjt+dyjt*dyjt+dzjt*dzjt)
+> 	  angle=(xjet*dxjt+yjet*dyjt+zjet*dzjt)/drjt
+> 	  angle=dacos(angle)	
+5252,5253c5484,5485
+<      &    .and.er.ge.rinjt.and.er.lt.routjt)then
+<             rr2=(rinjt/er)**2
+---
+>      &    .and.drjt.ge.rinjt.and.drjt.lt.routjt)then
+>             rr2=(rinjt/drjt)**2
+5256,5261c5488,5501
+< 	    fdustd=dstdjt*rr2
+< 	    fdens=densjt*rr2
+< 	    fne=anejt*rr2
+< 	    fvr=vjt*far/er+vxjt
+< 	    fvt=vjt*fat/er+vyjt
+< 	    fvz=vjt*faz/er+vzjt
+---
+> 	    if(ivjt.eq.2)then
+> 	      vel=vjt*(1.d0-rcjt/drjt)**eveljt
+> 	      vel1=vjt*(1.d0-rcjt/rinjt)**eveljt
+> 	    else
+> 	      vel=vjt*(drjt/rinjt)**eveljt
+> 	      vel1=vjt
+> 	    endif
+> 	    velr=vel1/vel
+> 	    fdustd=dstdjt*rr2*velr
+> 	    fdens=densjt*rr2*velr
+> 	    fne=anejt*rr2*velr
+> 	    fvr=vel*dxjt/drjt+vxjt
+> 	    fvt=vel*dyjt/drjt+vyjt
+> 	    fvz=vel*dzjt/drjt+vzjt
+5284c5524
+< 	real(i8):: vvsh,vshr,rr2vv,vshin
+---
+> 	real(i8):: vshr,rr2vv,vshin
+5297,5299c5537,5539
+< 	  vvsh=(er/rinsh)**(-evelsh)
+< 	  vshr=vsh/vvsh
+< 	  rr2vv=rinsh*rinsh/(er*er)*vvsh
+---
+> 	  vshr=vsh*(er/rinsh)**(evelsh)
+> 	  vshin=vsh
+> 	  rr2vv=rinsh*rinsh/(er*er)*vshin/vshr
+6288a6529
+> 	  write(3,131)
+6293a6535
+> 	  write(3,131)
+6298a6541
+> 	  write(3,131)
+6306a6550
+> 	  write(3,131)
+6387d6630
+< !	    write(3,*)xn(i),rosuy(i),pout
+6443c6686
+<             write(*,*)' Error: Newton-Raphson slipped in subr.: Roche,',&
+---
+>             write(*,*)' error: Newton-Raphson slipped in subr.: Roche,',&
+6444a6688
+>             write(3,*)' 1 error: Newton-Raphson slipped in subr. Roche'
+6631a6876
+> 131	format(' 1 error: inconsistent input in subroutine: roche')
+6835,6857d7079
+<         subroutine chk_alam(nspec1,in1,xstar1,nstar1,alam1,alamn)
+< !
+< ! check the wavelength range of synthetic spectrum
+< !
+<         implicit double precision (a-h,o-z)
+<         include 'param.inc'
+<         character*50 in1
+<         dimension xstar1(mstarx,mspecx)
+<         dimension in1(mspecx),nstar1(mspecx)
+< 
+<         do j=1,nspec1
+<           if ((alam1.lt.xstar1(1,j)).or.                                &
+<      &      (alamn.gt.xstar1(nstar1(j),j))) then
+<             write(*,*) 'Error: file "', trim(in1(j)), '" has ',         &
+<      &        'insufficient wavelength range from ', xstar1(1,j),       &
+<      &        ' to ',xstar1(nstar1(j),j), ' Ang, while alam1 = ',       &
+<      &        alam1, ' and alamn = ', alamn, ' Ang'
+<             call exit(3)
+<           endif
+<         enddo
+<         return
+<         end
+< !-----------------------------------------------------------------------
+6862,6863c7084
+<      &  ,lunt1,lunt2,lunt3,dlst,dlst2,dlcp,dlcp2                        &
+<      &  ,alam1,alamn)
+---
+>      &  ,lunt1,lunt2,lunt3,dlst,dlst2,dlcp,dlcp2,alam,nfreq)
+6866c7087
+< !		dlst,dlst2,dlcp,dlcp2,tstar1,tstar2
+---
+> !		dlst,dlst2,dlcp,dlcp2,tstar1,tstar2,alam,nfreq
+6881a7103
+>         real(i8):: alam(mfreq)
+6884,6885c7106
+< 	integer:: lunt1,lunt2,lunt3,nspec1,nspec2,nstar3
+<         real(i8):: alam1,alamn
+---
+> 	integer:: lunt1,lunt2,lunt3,nspec1,nspec2,nstar3,nfreq
+6898,6901d7118
+<           if (nspec1.gt.mspecx) then
+<             write(*,*)'error: nspec1 = ', nspec1, '.gt.mspecx = ',mspecx
+<             call exit(4)
+<           endif
+6914,6915c7131,7133
+< 	        write(*,*)'error: tspec1 in starspec1, stop'
+< 	        call exit(2)
+---
+> 	        write(*,*)' error: tspec1 in starspec1, stop'
+> 	        write(3,*)' 1 error: tspec1 in starspec1, stop'
+> 	        call exit(1)
+6932a7151
+>                   write(3,*)' 1 input error in starspec1 on line ',i,j
+6936a7156,7157
+> 	          write(3,*)' 1 error in starspec1: '
+>                   write(3,*)'dimension mstarx almost exceeded'
+6948a7170
+>                   write(3,*)' 1 input error in starspec1 on line ',i,j
+6952a7175,7176
+> 	          write(3,*)' 1 error in starspec1: '
+> 	          write(3,*)'dimension mstarx almost exceeded'
+6962a7187
+>                   write(3,*)' 1 input error in starspec1 on line ',i,j
+6966a7192,7193
+> 	          write(3,*)' 1 error in starspec1: '
+>                   write(3,*)'dimension mstarx almost exceeded'
+6977a7205,7211
+> 	    if(alam(1).lt.xstar1(1,j).or.                               &
+> 	    alam(nfreq).gt.xstar1(nstar1(j),j))then
+> 	      write(*,*)' error in starspec1: '
+>               write(*,*)'short range of lambdas'
+> 	      write(3,*)' 1 error in starspec1: '
+>               write(3,*)'short range of lambdas'
+> 	    endif	    
+6980d7213
+<           call chk_alam(nspec1,in1,xstar1,nstar1,alam1,alamn)
+7021,7024d7253
+<           if (nspec2.gt.mspecx) then
+<             write(*,*)'error: nspec2 = ', nspec2, '.gt.mspecx = ',mspecx
+<             call exit(4)
+<           endif
+7037,7038c7266,7268
+< 	        write(*,*)'error: tspec2 in starspec2, stop'
+< 	        call exit(2)
+---
+> 	        write(*,*)' error: tspec2 in starspec2, stop'
+> 	        write(3,*)' 1 error: tspec2 in starspec2, stop'
+> 	        call exit(1)
+7055a7286
+>                   write(3,*)' 1 input error in starspec2 on line ',i,j
+7059a7291,7292
+> 	          write(3,*)' 1 error in starspec2: '
+>                   write(3,*)'dimension mstarx almost exceeded'
+7071a7305
+>                   write(3,*)' 1 input error in starspec2 on line ',i,j
+7075a7310,7311
+> 	          write(3,*)' 1 error in starspec2: '
+>                   write(3,*)'dimension mstarx almost exceeded'
+7085a7322
+>                   write(3,*)' 1 input error in starspec2 on line ',i,j
+7089a7327,7328
+> 	          write(3,*)' 1 error in starspec2: '
+>                   write(3,*)'dimension mstarx almost exceeded'
+7100a7340,7346
+> 	    if(alam(1).lt.xstar2(1,j).or.                               &
+> 	    alam(nfreq).gt.xstar2(nstar2(j),j))then
+> 	      write(*,*)' error in starspec2: '
+>               write(*,*)'short range of lambdas'
+> 	      write(3,*)' 1 error in starspec2: '
+>               write(3,*)'short range of lambdas'
+> 	    endif	       
+7103d7348
+<           call chk_alam(nspec2,in2,xstar2,nstar2,alam1,alamn)
+7152a7398
+>                 write(3,*)' 1 input error in starspec3 on line ',i
+7157c7403,7404
+<                 call exit(4)
+---
+> 	        write(3,*)' 1 error in starspec3: '
+>                 write(3,*)'dimension mstarx almost exceeded'
+7170a7418
+>                 write(3,*)' 1 input error in starspec3 on line ',i
+7175c7423,7424
+<                 call exit(4)
+---
+> 	        write(3,*)' 1 error in starspec3: '
+>                 write(3,*)'dimension mstarx almost exceeded'
+7185a7435
+>                 write(3,*)' 1 input error in starspec3 on line ',i
+7189a7440,7441
+> 	        write(3,*)' 1 error in starspec3: '
+>                 write(3,*)'dimension mstarx almost exceeded'
+7199a7452,7458
+>           if(alam(1).lt.xstar3(1).or.                                   &
+> 	  alam(nfreq).gt.xstar3(nstar3))then
+> 	      write(*,*)' error in starspec3: '
+>               write(*,*)'short range of lambdas'
+> 	      write(3,*)' 1 error in starspec3: '
+>               write(3,*)'short range of lambdas'
+> 	  endif	       
+7228a7488
+> 	real(i8):: eloi,eupi,gr0i,gs0i,gw0i
+7233,7234c7493,7504
+< 10      read(8,*,err=20,end=20)dll,cod,gf,elo(i),qlo,eup(i),qup         &
+<      &  ,gr0(i),gs0(i),gw0(i)
+---
+> 10      read(8,*,err=20,end=20)dll,cod,gf,eloi,qlo,eupi,qup             &
+>      &  ,gr0i,gs0i,gw0i
+> 	if(i.gt.mline)then
+> 	  write(*,*)' error: No. of lines>mline in line.dat. Stop.'
+> 	  write(3,*)' 1 error: No. of lines>mline in line.dat. Stop.'
+> 	  call exit(1)
+> 	endif
+> 	elo(i)=eloi
+> 	eup(i)=eupi
+> 	gr0(i)=gr0i
+> 	gs0(i)=gs0i
+> 	gw0(i)=gw0i
+7311,7312c7581,7583
+< !	  write(*,*)'error in subroutine: fend'
+< !	  stop
+---
+> !	  write(*,*)' error in subroutine: fend'
+> !	  write(3,*)' 1 error in subroutine: fend'
+> !	  call exit(1)
+7574,7575c7845,7847
+< 	      write(*,*)'stop, slow/no convergence in subroutine: elnd'
+< 	      call exit(2)
+---
+> 	      write(*,*)' error, slow/no convergence in sub.: elnd'
+> 	      write(3,*)' 1 error, slow/no convergence in sub.: elnd'
+> 	      call exit(1)
+7901,7902c8173,8175
+< 	  write(*,*) 'gas_opac: ny.lt.2.or.ny.gt.mspecx'
+<           call exit(1)
+---
+> 	  write(*,*)'1 error in gas_opac: ny.lt.2.or.ny.gt.mspecx'
+> 	  write(3,*)'1 error in gas_opac: ny.lt.2.or.ny.gt.mspecx'
+> 	  call exit(1)
+7905,7906c8178,8180
+< 	  write(*,*) 'gas_opac: xsecn.gt.xsec1'
+<           call exit(1)
+---
+> 	  write(*,*)' 1 error in gas_opac: xsecn.gt.xsec1'
+> 	  write(3,*)' 1 error in gas_opac: xsecn.gt.xsec1'
+> 	  call exit(1)
+7915,7916c8189,8191
+< 	  write(*,*) 'gas_opac: x.gt.xsec1'
+<           call exit(1)
+---
+> 	  write(*,*)' 1 error in gas_opac: x.gt.xsec1'
+> 	  write(3,*)' 1 error in gas_opac: x.gt.xsec1'
+> 	  call exit(1)
+7942,7943c8217,8219
+< 	  write(*,*) 'gas_opac: nxsec.gt.mstarx'
+<           call exit(1)
+---
+> 	  write(*,*)' 1 error in gas_opac: nxsec.gt.mstarx'
+> 	  write(3,*)' 1 error in gas_opac: nxsec.gt.mstarx'
+> 	  call exit(1)
+8144,8146c8420,8424
+<           write(6,*)'stop nodp+1>modp in split1',nodp,modp
+<           write(6,*)'steep/high density gradient on the edge'
+<           call exit(2)
+---
+>           write(*,*)' error: nodp+1>modp in split1',nodp,modp
+>           write(*,*)'steep/high density gradient on the edge'
+>           write(3,*)' 1 error: nodp+1>modp in split1',nodp,modp
+>           write(3,*)'steep/high density gradient on the edge'
+>           call exit(1)
+8184,8186c8462,8466
+<           write(6,*)'stop n+1>m in split2',n,m
+<           write(6,*)'steep/high density gradient on the edge'
+<           call exit(2)
+---
+>           write(*,*)' error: n+1>m in split2',n,m
+>           write(*,*)'steep/high density gradient on the edge'
+>           write(3,*)' 1 error: n+1>m in split2',n,m
+>           write(3,*)'steep/high density gradient on the edge'
+>           call exit(1)
+8213,8214c8493
+< 	include 'pfdwor_inc.f90'
+< 
+---
+> 	include 'pfdwor_inc.f90'
+\ No newline at end of file

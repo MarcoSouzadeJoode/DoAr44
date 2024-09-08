@@ -1,0 +1,117 @@
+
+        self.wvl = []
+
+        if self.wvl == None:
+            return 0.0
+
+radial velocities of ISTAR and ICOMP objects are WRONG!
+  vr = 0 for the central ISTAR
+  vr = K2*sin(phase) + 2*K1
+for INEBL the amplitude is correct
+  vr = K1*sin(phase)
+
+Note: central * is always @ the center
+-- is the image shifted in Pyshellspec?!
+-> YES in __FT_one_image()
+
+AHA! It was because Phoenix haw wrong (vacuum) wavelengths...
+
+#            print "dtype = ", dtype
+#            print "self.__sed_comparison['eff_wave'] = ", self.__sed_comparison['eff_wave']
+#            print "self.__sed_comparison['phase'] = ", self.__sed_comparison['phase']
+#            print "self.__spe_comparison['eff_wave'] = ", self.__spe_comparison['eff_wave']
+#            print "self.__spe_comparison['phase'] = ", self.__spe_comparison['phase']
+#            print "ew = ", ew
+#            print "ph = ", ph
+#            print "ew_ph = ", ew_ph
+
+#            print "ew_ph = ", ew_ph['eff_wave'][0]
+
+
+
+#            print "phase = ", phase  # dbg
+            f=open("obswave_%.3f" % (phase),"w")
+            for i in xrange(0,len(obswave)):
+                f.write("%.8e  %.8e\n" % (obswave[i], synflux_itp[i]))
+            f.close()
+
+            f=open("synwave_%.3f" % (phase),"w")
+            for i in xrange(0,len(synwave)):
+                f.write("%.8e  %.8e\n" % (synwave[i], synflux[i]))
+            f.close()
+ #           sys.exit(1)
+
+
+def interpolate1d_hermite(xnew, x, y):
+    """
+    Interpolates in y = f(x) at xnew.
+    :param xnew:
+    :param x:
+    :param y:
+    :return:
+    """
+    tck = np.polynomial.hermite.hermfit(x, y, 3)
+    ynew = np.polynomial.hermite.hermval(xnew, tck)
+
+    return ynew
+
+
+#        print "self.__spe_comparison = ", self.__spe_comparison
+
+            print "ew_ph['phase'] = ", ew_ph['phase']
+            print "ew_ph['eff_wave'][0] = ", ew_ph['eff_wave'][0]
+
+            for phase in ew_ph['phase']:
+                diff = np.absolute(ew - eff_wave)
+                ind = np.where(diff < 10 ** -sed_ew_precision)[0]
+                ew_ph['phase'].append(phase[ind].tolist())
+
+            for i in range(0, len(ew_ph['eff_wave'])):
+                ew_ph['phase'][i] = np.unique(ew_ph['phase'][i]).tolist()
+
+#                print "i = ", i
+#                print self.__vis_comparison['visphi']
+#                print self.__vis_comparison['visphierr']
+#                print self.__vis_comparison['visphisyn']
+#                print self.__vis_comparison['chi2phi']
+
+        #self.__vis2_comparison['chi2'] = ((self.__vis2_comparison['vis2data'] - self.__vis2_comparison['vis2syn']) / self.__vis2_comparison['vis2err']) ** 2
+        #chi2_vis2 = np.sum(self.__vis2_comparison['chi2'])
+        #n_vis2 = self.__vis2_comparison['vis2data'].size
+
+        if exitcode != 0:
+            print "Error running shellspec, exitcode = " + str(exitcode)
+            sys.exit(exitcode)
+
+                print "mags = " + str(mags)
+                print "len(mags) = " + str(len(mags))
+
+        print "len(lcsyn[\'magnitude\']) = " + str(len(lcsyn['magnitude']))  # dbg
+
+            print "synphase = " + str(synphase)  # dbg
+            print "synmag = " + str(synmag)  # dbg
+
+            print "len(obsphase) = " + str(len(obsphase))  # dbg
+            print "len(synphase) = " + str(len(synphase))  # dbg
+            print "len(synmag) = " + str(len(synmag))  # dbg
+
+        print self.__cp_comparison['t3amp']
+        n = 0
+        m = 0
+        for i in range(len(self.__cp_comparison['t3amp'])):
+            if self.__cp_comparison['t3amp'][i] != None:
+                n += 1
+            else:
+                m += 1
+        print "n = " + str(n)
+        print "m = " + str(m)
+                
+#        is_ = np.isfinite(np.array(self.__cp_comparison['t3amp']))
+        sys.exit(1)
+
+    def set_phase(self):
+        """
+        Sets orbital phase to all data.
+        """
+        self.__set_phase()
+

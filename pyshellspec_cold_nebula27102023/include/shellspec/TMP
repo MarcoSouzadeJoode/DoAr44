@@ -1,0 +1,3 @@
+
+            write(*,*) 'rosuy(', i, ') = ', rosuy(i), ' > 0'
+            write(*,*) 'dypot = ', dypot(xn(i),rosuy(i),0.d0,q), ' >= 0'

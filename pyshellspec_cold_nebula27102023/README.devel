@@ -1,0 +1,26 @@
+
+There is a "hole" above star, because nebula has a hole.
+No gas above star is not very realistic though.
+
+2DO: alpha angle definition will be changed in vers. 53
+
+--
+
+2DO: shadowing does NOT work correctly in Halpha
+     (it's optically thick at given lambda and
+     azimuthal direction; yet, the scattering is
+     always optically thin above given hshdnb)!
+
+2DO: SED synthetic spectra show NO H-alpha emission!
+     That's wrong sampling -> need to compute ~5 times
+     more data points and then CONVOLVE w. intrumental
+     profile of Burnasev! (see e.g. convolve.py)
+     Alternatively, use also SYN spectra and ignore
+     these chi^2 terms in Halpha. <- OK
+
+2DO: improve RTE in Shellspec again to avoid artefacts OK
+     ideally, use a BS integrator <- NOT YET DONE!
+
+--
+
+
