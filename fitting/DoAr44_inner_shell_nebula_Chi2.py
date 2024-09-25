@@ -54,7 +54,7 @@ def main():
     obs.append(pyshellspec3.IFData(filename=IF_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
     
     #HALFA
-    HALFA_combined = '../data/HALFA_combined'
+    HALFA_combined = '../data/HALFA_combined_NEW'
     obs.append(pyshellspec3.SPEData(filename=HALFA_combined))
     
     
@@ -214,7 +214,7 @@ def main():
     itf.set_parameter('dd'      , value=146.3                , fitted=False, vmin=305., vmax=330.)
     
     # TODO: najít si gamma
-    itf.set_parameter('vgamma'  , value=5               , fitted=False, vmin=-100., vmax=100.)
+    itf.set_parameter('vgamma'  , value=100               , fitted=False, vmin=-100., vmax=100.)
     
     
 

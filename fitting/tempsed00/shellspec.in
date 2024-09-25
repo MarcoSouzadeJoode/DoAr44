@@ -3,13 +3,13 @@
 # imodel  irotat  ipart   ichemc  ielnd
 1   1   0   1   1
 # ithom   irayl   imie    imiepf  ihyd   iopac  iline   eps     (opacities)
-1   1   1   0   1   0   1   1.0
+1   1   0   0   1   0   1   1.0
 # ionu  ior  iot  offset
-1   50   50   0.0
+1   40   40   0.0
 # phase1[deg]  phasen[deg]  nphase    dinc[deg]
-0.   360.   0   23.0
+0.   360.   0   40.0
 # dd[pc]   vgamma[km/s]
-146.3   -0.0
+146.3   100.0
 # iext	  rv      ebv[mag]    reddening/extinction
 0   3.1   0.3226
 #----------------spectra of the non-transparent objects---------------------
@@ -21,9 +21,9 @@
 0   1.   1.
 #-----------------------A. body frozen grid ----------------------------
 # rmdfx1 rmdfx2 rmdfy1 rmdfy2 rmdfz1 rmdfz2 rmdfx3 rmdfx4 [R_sol]  
--17200.01   17200.01   -17200.01   17200.01   -17200.01   17200.01   0.0   0.0
+-35.01   35.01   -35.01   35.01   -35.01   35.01   0.0   0.0
 # stepfx[R_sol] stepfy[R_sol] stepfz[R_sol] gainfx gainfy gainfz  
-172.0   172.0   172.0   1.0   1.0   1.0
+0.5833333333333334   0.5833333333333334   0.5833333333333334   1.0   1.0   1.0
 #-----------------------B. body frozen grid ----------------------------
 # rmdfx3  rmdfx4  rmdfy3  rmdfy4  rmdfz3  rmdfz4  [R_sol]  
 0.   0.   0.0   0.0   0.0   0.0
@@ -31,9 +31,9 @@
 0.2   0.2   0.2   1.0   1.0   1.0
 #-----------------------A. line of sight grid --------------------------
 # rmdx1  rmdx2  rmdy1  rmdy2  rmdz1  rmdz2  rmdz3  rmdz4 [R_sol]
--17200.0   17200.0   -17200.0   17200.0   -17200.0   17200.0   0.0   0.0
+-35.0   35.0   -35.0   35.0   -35.0   35.0   0.0   0.0
 # stepx[R_sol] stepy[R_sol] stepz[R_sol] gainx  gainy  gainz  
-172.0   172.0   172.0   1.0   1.0   1.0
+0.5833333333333334   0.5833333333333334   0.5833333333333334   1.0   1.0   1.0
 #-----------------------B. line of sight grid --------------------------
 # rmdx3   rmdx4   rmdy3   rmdy4   rmdz3   rmdz4   [R_sol]
 0.0   0.0   0.0   0.0   0.   0.
@@ -41,20 +41,20 @@
 0.2   0.2   0.2   1.0   1.0   1.0
 #-----------------------------objects---------------------------------------
 # ISTAR# ICOMP# ISPOT# ISM#  IRING# IDISC# IENV# 
-0   0   0   0   0   0   0
+1   0   0   0   0   0   0
 # INEBL# IFLOW# IJET# IUFO#  ISHELL#
-1   0   0   0   0
+1   0   0   0   3
 #---------------------------- central star ---------------------------------
 # rstar[R_sol]   Tstar[K]   eMstar[M_sol]
-1.85   4350.0   1.4041864444355125
+2.0   4750.0   1.4041864444355134
 # xstar  ystar  zstar  vrotst[km/s] (rotation) 
 0.0   0.0   1.0   10.0
 # idifst drotst hst                 (differential rotation) 
 0   0.9   0.1
 # vxst[km/s] vyst[km/s] vzst[km/s]  (movement)
-0.0   -0.1372378453606012   0.0
+0.0   -0.2257685148325556   0.0
 # dlst   dlst2  dgst   ffst         (darkening+shape)
-0.101938457592   0.0   0.25   0.0
+0.094   0.0   0.25   0.0
 # irrst  ialbst albst  htst  htsta  (reflection effect)
 0   0   0.3   0.6   1.0
 # ispst xspst yspst zspst aspst[deg] tspst   (spot)
@@ -65,11 +65,11 @@
 # vrxcp vrycp vrzcp vrotcp[km/s]    (rotation)
 0.0   0.0   1.0   10.0
 # xcp[R_sol] ycp[R_sol] zcp[R_sol]  (location)
-214.98159188078597   0.0   0.0
+214.981591880786   0.0   0.0
 # vxcp[km/s] vycp[km/s] vzcp[km/s]  (movement)
-0.0   13.72378453606012   0.0
+0.0   22.57685148325556   0.0
 # dlcp  dlcp2  dgcp   ffcp          (darkening+shape)
-0.101938457592   0.0   0.25   1.0
+0.094   0.0   0.25   1.0
 # irrcp  ialbcp albcp  htcp  htcpa  (reflection effect)
 0   0   0.0   1.0   1.0
 #------------------------------ spot ---------------------------------------
@@ -111,17 +111,17 @@
  -25.     4.65e-15   -6.     0.43e-15   2100.
 #------------------------------ disc ---------------------------------------
 # adisc[deg,R_sol]  rindc[R_sol]  routdc[R_sol]  emdc[Msol] rdc[Rsol]
-15.0   215.0   1075.0   1.4041864444355125   1.85
+12.0   6.0   30.0   1.4041864444355134   2.0
 # xdc[R_sol] ydc[R_sol] zdc[R_sol]     (location)
 0.0   0.0   0.0
 # xdisc ydisc zdisc                 (orientation)
 0.0   0.0   1.0
 # vxdc[km/s] vydc[km/s] vzdc[km/s]  (net velocity)
-0.0   -0.1372378453606012   0.0
+0.0   -0.2257685148325556   0.0
 # tempdc[K]   densdc     anedc  vtrbdc  edendc itdc etmpdc
-1000.0   1e-08   12000000000.0   10.0   -1.0   3   0.0
+30000.0   1e-06   12000000000.0   10.0   -1.0   3   -0.85
 # dstddc    dsttdc[K]
-1e-11   1000.0
+0.0   1000.0
 #---------------------------- envelope -------------------------------------
 # emen[M_sol]  qqen   aen[R_sol]  ffen  hen[R_sol]
   13.048      0.2230   58.349      1.0    12.
@@ -129,7 +129,7 @@
    9000.      1.e-8    21.e9     0.   0.0000  7050.
 #---------------------------- nebula ---------------------------------------
 # aneb[H]      rinnb[R_sol]  routnb[R_sol]  emnb[Msol] rnb[Rsol]
-0.2   8600.0   12900.0   1.4041864444355125   1.85
+1.5   16.5   35.0   1.4041864444355134   2.0
 # iinvnb hinvnb[H]   tinvnb               (temp.inversion)
 1   8.0   6.0
 # hwindnb[H]  idennb  hcnb[H]             (wind/H-scale)
@@ -141,11 +141,11 @@
 # xneb yneb zneb                          (orientation)
 0.0   0.0   1.0
 # vxnb[km/s] vynb[km/s] vznb[km/s]        (net velocity)
-0.0   -0.1372378453606012   0.0
+0.0   -0.2257685148325556   0.0
 # tempnb[K]   densnb     anenb  vtrbnb  edennb itnb etmpnb
-150.0   5e-20   12000000000.0   1.0   -0.5   3   -0.5
+2500.0   1e-08   12000000000.0   10.0   -0.5   3   -0.7
 # dstdnb    dsttnb[K]
-1e-14   60.0
+0.0   1000.0
 #------------------------------- flow - ------------------------------------
 # v1fw[km/s]  v2fw[km/s]  r1fw[R_sol]  r2fw[R_sol]  
   100.        100.        0.2          0.2
@@ -187,13 +187,13 @@
 5.7e-30  8000.
 #----------------------------- shell ---------------------------------------
 # rinsh[R_sol]  routsh[R_sol]   vsh[km/s] 
-10.0   15.0   1.0
+3.0   9.0   330.0
 # evelsh  rcsh[R_sol]  
-0.0   4.4
+1.3   2.0
 # vxsh[km/s] vysh[km/s] vzsh[km/s]  (net velocity)
 0.0   -46.0   0.0
 # tempsh[K] denssh     anesh  vtrbsh  dstdsh  dsttsh[K]  etmpsh
-9000.0   3e-14   21000000000.0   500.0   1e-30   9000.0   0.0
+10000.0   2.8e-13   21000000000.0   1.0   1e-30   9000.0   0.0
 #--------------------------- background ------------------------------------
 # temp0[K]  dens0    ane0       v0[km/s] 
 4000.      0.e0     1.e7       0. 

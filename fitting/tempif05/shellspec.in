@@ -9,7 +9,7 @@
 # phase1[deg]  phasen[deg]  nphase    dinc[deg]
 0.   360.   0   40.0
 # dd[pc]   vgamma[km/s]
-146.3   5.0
+146.3   100.0
 # iext	  rv      ebv[mag]    reddening/extinction
 0   3.1   0.3226
 #----------------spectra of the non-transparent objects---------------------
