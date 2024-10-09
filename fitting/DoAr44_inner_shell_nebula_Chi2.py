@@ -50,8 +50,8 @@ def main():
     """
     
     # VLTI data
-    IF_data_filename = '../data/VLTI_multiplied.dat'
-    obs.append(pyshellspec3.IFData(filename=IF_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
+    #IF_data_filename = '../data/VLTI_multiplied.dat'
+    #obs.append(pyshellspec3.IFData(filename=IF_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
     
     #HALFA
     HALFA_combined = '../data/HALFA_combined_NEW'
@@ -59,12 +59,12 @@ def main():
     
     
     #SED data
-    SED_data_filename = '../data/SED_NEBULA_DR_cgs_flux_inner'
-    obs.append(pyshellspec3.SEDData(filename=SED_data_filename))
+    #SED_data_filename = '../data/SED_NEBULA_DR_cgs_flux_inner'
+    #obs.append(pyshellspec3.SEDData(filename=SED_data_filename))
     
     # VLTI data
-    CLO_data_filename = '../data/Clo_DoAr44'
-    obs.append(pyshellspec3.IFData(filename=CLO_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
+    #CLO_data_filename = '../data/Clo_DoAr44'
+    #obs.append(pyshellspec3.IFData(filename=CLO_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
     
     
     #SED data
@@ -125,7 +125,7 @@ def main():
     
     # construct the Interface
     
-    pixels = 60
+    pixels = 100
     print("OK")
     itf = pyshellspec3.Interface(model=model, data=data, ncpu=8,
         image_size=pixels*2+1,
@@ -211,10 +211,10 @@ def main():
     
 
 
-    itf.set_parameter('dd'      , value=146.3                , fitted=False, vmin=305., vmax=330.)
+    itf.set_parameter('dd'      , value=146.3                , fitted=False, vmin=0., vmax=330.)
     
     # TODO: najít si gamma
-    itf.set_parameter('vgamma'  , value=100               , fitted=False, vmin=-100., vmax=100.)
+    itf.set_parameter('vgamma'  , value=84.99               , fitted=True, vmin=30., vmax=120.)
     
     
 
@@ -223,7 +223,7 @@ def main():
 
 
     # změřeno v CARTA z Band 6, 7 pozorování. Zde ale nehraje roli
-    dinc = 40
+    dinc = 40.5
     itf.set_parameter('dinc'    , value=dinc                 , fitted=False, vmin=10., vmax=30.)
     
     # nastaveno tak, aby odpovídalo M = 1.4 M_sun. takto koresponduje syntetickým spektrům
@@ -298,7 +298,7 @@ def main():
 
     
     itf.set_parameter('idisc', value=0)
-    itf.set_parameter('ishell', value=3)
+    itf.set_parameter('ishell', value=3) #3
     itf.set_parameter('ijet', value=0)
     itf.set_parameter('ispot', value=0)
     itf.set_parameter('inebl', value=1)
@@ -323,11 +323,11 @@ def main():
 
     itf.set_parameter('vtrbsh', value=1, vmin = 0, vmax = 100)
     
-    itf.set_parameter('routsh', value=9, fitted=False, vmin=2, vmax = 45)
-    itf.set_parameter('vsh',    value=330, fitted=True, vmin = 200, vmax = 1000)
-    itf.set_parameter('denssh', value=2.8e-13, fitted=True, vmin = 1e-14, vmax = 7e-13)
-    itf.set_parameter('tempsh', value=10_000,fitted=True, vmin = 9000, vmax = 30000)
-    itf.set_parameter('evelsh', value=1.3,fitted=True, vmin = 1, vmax = 4)
+    itf.set_parameter('routsh', value=22.07, fitted=True, vmin=8, vmax = 45)
+    itf.set_parameter('vsh',    value=384.69, fitted=True, vmin = 350, vmax = 500)
+    itf.set_parameter('denssh', value=1.82e-13, fitted=True, vmin = 1e-13, vmax = 3e-13)
+    itf.set_parameter('tempsh', value=9_118,fitted=True, vmin = 6000, vmax = 10000)
+    itf.set_parameter('evelsh', value=1.01,fitted=True, vmin = 0.7, vmax = 1.3)
     
     
     #END SHELL ----
@@ -340,7 +340,7 @@ def main():
     #itf.run_fit(fitter='sp_diff_evol', tol=1e-2, maxiter=100)
 
     # fitter
-    #itf.run_fit(fitter='nlopt_nelder_mead', ftol=1e-6, maxiter=200)
+    #itf.run_fit(fitter='nlopt_nelder_mead', ftol=1e-6, maxiter=1000)
 
 
     itf.write_iterations()

@@ -113,7 +113,9 @@ def main(param):
     uvdist = np.sqrt(uwave**2 + vwave**2) * 1e-6
     
     
+    fn = "../tmp.spe.syn.dat"
     fn = "../HALFA_combined_NEW.spe.syn.dat"
+
     #fn = "/home/marco/Desktop/ALMA/oct2023/Nebula2/fitting/UVES_HBETA.spe.syn.dat"
     with open(fn, 'r') as file:
         # Read the lines
@@ -214,13 +216,13 @@ def main(param):
     
     
     factor = 1
-    ax3.scatter(eff_wave*1e9, flux, c="k", s=3, label="VLT/XSHOOTER")
-    ax3.plot(eff_wave*1e9, flux, c="k", linewidth=1, label="VLT/XSHOOTER")
+    ax3.scatter(eff_wave*1e9, flux, c="k", s=3, label="VLT spectra")
+    ax3.plot(eff_wave*1e9, flux, c="k", linewidth=1)
 
     ax3.scatter(eff_wave*1e9, (np.array(fluxsyn) - 1) * factor + 1, c="r", s=3, label=f"synthetic")
-    ax3.plot(eff_wave*1e9, (np.array(fluxsyn) - 1) * factor + 1, c="r", linewidth=1, label=f"synthetic")
+    ax3.plot(eff_wave*1e9, (np.array(fluxsyn) - 1) * factor + 1, c="r", linewidth=1)
     ax3.fill_between(eff_wave*1e9, flux-error, flux+error, alpha=0.6)
-
+    ax3.legend()
 
 
     ax3.set_ylabel("Relative intensity", fontsize=10)
@@ -254,7 +256,7 @@ def main(param):
     
     import time
     #cb = fig.colorbar(mappable, fraction=0.046, pad=0.04)
-    plt.savefig(f"plot_logs/SYN_IF_SPE_{time.time()}.png", dpi=500)
+    plt.savefig(f"../plot_logs/SYN_IF_SPE_{time.time()}.png", dpi=500)
     plt.show()
 
 if __name__ == "__main__":
