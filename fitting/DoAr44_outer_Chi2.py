@@ -112,7 +112,7 @@ def main():
     
     # construct the Interface
     
-    pixels = 100
+    pixels = 120
     print("OK")
     itf = pyshellspec3.Interface(model=model, data=data, ncpu=8,
         image_size=pixels*2+1,
@@ -173,10 +173,10 @@ def main():
 
     # R. Ricci et al. 2010.
     
-    itf.set_parameter('rstar', value=1.85)
+    itf.set_parameter('rstar', value=2)
 
     # modified
-    itf.set_parameter('Tstar', value=4350)
+    itf.set_parameter('Tstar', value=4750)
     
     # END STAR ----------
 
@@ -199,9 +199,7 @@ def main():
 
 
     itf.set_parameter('dd'      , value=146.3                , fitted=False, vmin=305., vmax=330.)
-    
-    # TODO: najít si gamma
-    itf.set_parameter('vgamma'  , value=-0.0                , fitted=False, vmin=-100., vmax=100.)
+ 
     
     
 
@@ -210,7 +208,7 @@ def main():
 
 
     # změřeno v CARTA z Band 6, 7 pozorování. Zde ale nehraje roli. je 23.
-    dinc = 23
+    dinc = 22
     itf.set_parameter('dinc'    , value=dinc                 , fitted=False, vmin=10., vmax=30.)
     
     # nastaveno tak, aby odpovídalo M = 1.4 M_sun. takto koresponduje syntetickým spektrům

@@ -50,8 +50,8 @@ def main():
     """
     
     # VLTI data
-    #IF_data_filename = '../data/VLTI_multiplied.dat'
-    #obs.append(pyshellspec3.IFData(filename=IF_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
+    IF_data_filename = '../data/VLTI_multiplied.dat'
+    obs.append(pyshellspec3.IFData(filename=IF_data_filename, location='VLT', ra=ra, dec=dec, format='ascii'))
     
     #HALFA
     HALFA_combined = '../data/HALFA_combined_NEW'
@@ -59,8 +59,8 @@ def main():
     
     
     #SED data
-    #SED_data_filename = '../data/SED_NEBULA_DR_cgs_flux_inner'
-    #obs.append(pyshellspec3.SEDData(filename=SED_data_filename))
+    SED_data_filename = '../data/SED_NEBULA_DR_cgs_flux_inner'
+    obs.append(pyshellspec3.SEDData(filename=SED_data_filename))
     
     # VLTI data
     #CLO_data_filename = '../data/Clo_DoAr44'

@@ -175,9 +175,9 @@ def main(param):
     
     
     
-    fig.set_figheight(4.0)
+    fig.set_figheight(4.5)
     #fig.set_figwidth(13)
-    fig.set_figwidth(4.0)
+    fig.set_figwidth(4.5)
 
     
     minval = np.min(I_nu)
@@ -210,7 +210,7 @@ def main(param):
     TOTAL = np.array(data["fluxsyn"])[4:]*0.1 + np.array(data2["fluxsyn"])[4:]*0.1 + np.array(data3["fluxsyn"])[4:]*0.1
     #TOTAL = np.array(data["fluxsyn"])[4:]*0.1 + np.array(data3["fluxsyn"])[4:]*0.1
     ax4.plot(sed_wave[4:]*1e6, TOTAL, c="r")
-    ax4.scatter(sed_wave[4:]*1e6, TOTAL, s=10, c="r",label="total model")
+    ax4.scatter(sed_wave[4:]*1e6, TOTAL, s=20, c="r",label="total model")
 
     
     #ax4.vlines(2010, 1e-14, 1e-4, color="k")

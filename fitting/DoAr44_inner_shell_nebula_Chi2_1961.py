@@ -59,8 +59,8 @@ def main():
     
     
     #SED data
-    #SED_data_filename = '../data/SED_NEBULA_DR_cgs_flux_inner'
-    #obs.append(pyshellspec3.SEDData(filename=SED_data_filename))
+    SED_data_filename = '../data/SED_NEBULA_DR_cgs_flux_inner'
+    obs.append(pyshellspec3.SEDData(filename=SED_data_filename))
     
     # VLTI data
     #CLO_data_filename = '../data/Clo_DoAr44'

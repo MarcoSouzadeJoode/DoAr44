@@ -9,7 +9,7 @@
 # phase1[deg]  phasen[deg]  nphase    dinc[deg]
 0.   360.   0   40.5
 # dd[pc]   vgamma[km/s]
-146.3   120.0
+146.3   84.99
 # iext	  rv      ebv[mag]    reddening/extinction
 0   3.1   0.3226
 #----------------spectra of the non-transparent objects---------------------
@@ -23,7 +23,7 @@
 # rmdfx1 rmdfx2 rmdfy1 rmdfy2 rmdfz1 rmdfz2 rmdfx3 rmdfx4 [R_sol]  
 -35.01   35.01   -35.01   35.01   -35.01   35.01   0.0   0.0
 # stepfx[R_sol] stepfy[R_sol] stepfz[R_sol] gainfx gainfy gainfz  
-0.3888888888888889   0.3888888888888889   0.3888888888888889   1.0   1.0   1.0
+0.35   0.35   0.35   1.0   1.0   1.0
 #-----------------------B. body frozen grid ----------------------------
 # rmdfx3  rmdfx4  rmdfy3  rmdfy4  rmdfz3  rmdfz4  [R_sol]  
 0.   0.   0.0   0.0   0.0   0.0
@@ -33,7 +33,7 @@
 # rmdx1  rmdx2  rmdy1  rmdy2  rmdz1  rmdz2  rmdz3  rmdz4 [R_sol]
 -35.0   35.0   -35.0   35.0   -35.0   35.0   0.0   0.0
 # stepx[R_sol] stepy[R_sol] stepz[R_sol] gainx  gainy  gainz  
-0.3888888888888889   0.3888888888888889   0.3888888888888889   1.0   1.0   1.0
+0.35   0.35   0.35   1.0   1.0   1.0
 #-----------------------B. line of sight grid --------------------------
 # rmdx3   rmdx4   rmdy3   rmdy4   rmdz3   rmdz4   [R_sol]
 0.0   0.0   0.0   0.0   0.   0.
@@ -187,13 +187,13 @@
 5.7e-30  8000.
 #----------------------------- shell ---------------------------------------
 # rinsh[R_sol]  routsh[R_sol]   vsh[km/s] 
-3.0   21.685426301116777   500.0
+3.0   22.07   384.69
 # evelsh  rcsh[R_sol]  
-1.0   2.0
+1.01   2.0
 # vxsh[km/s] vysh[km/s] vzsh[km/s]  (net velocity)
 0.0   -46.0   0.0
 # tempsh[K] denssh     anesh  vtrbsh  dstdsh  dsttsh[K]  etmpsh
-9273.79404440058   4.999999999999993e-13   21000000000.0   1.0   1e-30   9000.0   0.0
+9118.0   1.82e-13   21000000000.0   1.0   1e-30   9000.0   0.0
 #--------------------------- background ------------------------------------
 # temp0[K]  dens0    ane0       v0[km/s] 
 4000.      0.e0     1.e7       0. 

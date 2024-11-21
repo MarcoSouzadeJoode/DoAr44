@@ -51,7 +51,7 @@ def img_reader(f):
     return img, minX, maxX
 
 def main(param):
-    fn = '../tempspe00/2Dimage_001'
+    fn = '../tempif00/2Dimage_001'
     I_nu, minX, maxX = img_reader(fn)
     
     I_nu_matrix = I_nu * u.erg / (u.cm**2 * u.s * u.Hz * u.sr)
@@ -193,7 +193,7 @@ def main(param):
     
     mappable = ax1.imshow((BT), cmap=cmap,
                           extent=[minX, maxX, minX, maxX],
-                          vmax=15,
+                          vmax=1000,
                           aspect="equal")
     
     
@@ -201,7 +201,7 @@ def main(param):
     ax1.set_ylabel("Y (au)", fontsize=10)
     #ax1.set_xticks([-60, -30, 0, 30, 60])
     #ax1.set_yticks([-60, -30, 0, 30, 60])
-    ax1.set_title(f"Synthetic shellspec image \n Brightness Temperature (K)")
+    ax1.set_title(f"Synthetic image, 2μm continuum \n Brightness Temperature (K)")
     fig.colorbar(mappable, ax=ax1)
     
     ax2.scatter(uvdist, vis2data, c="k", s=3, label="VLTI/GRAVITY")
@@ -213,7 +213,7 @@ def main(param):
     ax2.set_ylabel("Visibility $V^2$", fontsize=10)
     ax2.set_xlabel("UV distance $(M\lambda)$", fontsize=10)
     ax2.set_title(f"Interferometric visibilities \n $\chi^2 = $ {CHI2:.1e}")
-    
+    ax2.legend()
     
     factor = 1
     ax3.scatter(eff_wave*1e9, flux, c="k", s=3, label="VLT spectra")
